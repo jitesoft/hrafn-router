@@ -31,9 +31,9 @@ interface ActionInterface {
     /**
      * Get the class that will handle the message after all middlewares have been invoked.
      *
-     * @return string
+     * @return string|null
      */
-    public function getHandlerClass(): string;
+    public function getHandlerClass(): ?string;
 
     /**
      * Get the name of the function (case sensitive) of the class that will handle the the message after
@@ -42,9 +42,9 @@ interface ActionInterface {
      * Observe.
      * The method have to be publicly reachable from the router, or it will not be possible to invoke.
      *
-     * @return string
+     * @return string|null
      */
-    public function getHandlerFunction(): string;
+    public function getHandlerFunction(): ?string;
 
     /**
      * Get the type of action handler. The types can be either 'callback' or 'instance_method' and should be
