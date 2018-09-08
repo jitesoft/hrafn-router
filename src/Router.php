@@ -7,6 +7,8 @@
 
 namespace Hrafn\Router;
 
+use Hrafn\Router\Contracts\ActionNamespaceBuilderInterface;
+use Hrafn\Router\Traits\MethodToActionTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,7 +22,9 @@ use Psr\Log\NullLogger;
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-class Router implements LoggerAwareInterface, RequestHandlerInterface {
+class Router implements LoggerAwareInterface, RequestHandlerInterface, ActionNamespaceBuilderInterface {
+    use MethodToActionTrait;
+
     private const LOG_TAG = 'Hrafn\Router:';
 
     private $logger;
@@ -49,7 +53,35 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
-        $this->logger->debug('{tag} Message received, handle invoked.', ['tag' => self::LOG_TAG]);
-        return null;
+        // TODO: Implement handle() method.
+    }
+
+    /**
+     * Create a new namespace inside of current namespace.
+     * The new GroupInterface instance is passed as the single argument to the $closure callback.
+     *
+     * @param string     $pattern
+     * @param array|null $middleWares
+     * @param callable   $closure
+     * @return ActionNamespaceBuilderInterface
+     */
+    public function namespace(string $pattern, ?array $middleWares, callable $closure): ActionNamespaceBuilderInterface {
+        // TODO: Implement namespace() method.
+    }
+
+    /**
+     * Method which all the http-method specific methods forward data to.
+     *
+     * @param string $method
+     * @param string $pattern
+     * @param        $handler
+     * @param array  $middleWares
+     * @return ActionNamespaceBuilderInterface
+     */
+    protected function action(string $method,
+                              string $pattern,
+                              $handler,
+                              $middleWares = []): ActionNamespaceBuilderInterface {
+        // TODO: Implement action() method.
     }
 }

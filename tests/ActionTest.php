@@ -1,16 +1,19 @@
 <?php
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  Group.php - Part of the router project.
+  ActionTest.php - Part of the router project.
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-namespace Hrafn\Router;
+
+namespace Hrafn\Router\Tests;
+
+use PHPUnit\Framework\TestCase;
 
 /**
- * Group
+ * ActionTest
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-class Group {
+class ActionTest extends TestCase {
 
 }
