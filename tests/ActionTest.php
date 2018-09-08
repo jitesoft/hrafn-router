@@ -11,6 +11,9 @@ use Hrafn\Router\Action;
 use Hrafn\Router\Method;
 use function is_callable;
 use PHPUnit\Framework\TestCase;
+use function preg_match;
+use function preg_match_all;
+use function var_dump;
 
 /**
  * ActionTest
@@ -87,9 +90,28 @@ class ActionTest extends TestCase {
 
     public function testGetActionPathRegex() {
         $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('/test', $action->getActionPathRegex());
-        $action = new Action('get', 'className@classMethod', '/test/{with}/param');
-        $this->assertEquals('^/test/(*+)/param$', $action->getActionPathRegex());
+        $this->assertEquals('~^\/test[\/]?$~', $action->getActionPathRegex());
+        $action = new Action('get', 'className@classMethod', '/test/{with}/param/{?optional}');
+        $this->assertEquals("~^\/test\/(?'with'\w+)\/param[\/]?(?:(?'optional'\w+))?[\/]?$~", $action->getActionPathRegex());
+
+        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/');
+        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc');
+
+        $action = new Action('get', 'className@classMethod', '/test/{with}/param/{?optional}/{?again}');
+        $this->assertEquals("~^\/test\/(?'with'\w+)\/param[\/]?(?:(?'optional'\w+))?[\/]?(?:(?'again'\w+))?[\/]?$~", $action->getActionPathRegex());
+
+        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc');
+        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc/');
+        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc/abc');
     }
 
 }

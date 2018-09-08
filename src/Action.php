@@ -8,9 +8,11 @@ namespace Hrafn\Router;
 
 use Hrafn\Router\Contracts\ActionInterface;
 use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
+use Jitesoft\Utilities\DataStructures\Lists\LinkedList;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Action
@@ -18,6 +20,39 @@ use Psr\Log\LoggerInterface;
  * @version 1.0.0
  */
 class Action implements LoggerAwareInterface, ActionInterface {
+    private const LOG_TAG                      = 'Hrafn\Router\Action:';
+    private const HANDLER_SEPARATOR            = '@';
+    private const PLACEHOLDER_PATTERN          = '\{(\w+?)\}';
+    private const OPTIONAL_PLACEHOLDER_PATTERN = '\{\?(\w+)\}';
+    private const REGEX_DELIMITER              = '~';
+
+    private $logger          = null;
+    private $method          = null;
+    private $handlerClass    = null;
+    private $handlerMethod   = null;
+    private $handlerCallback = null;
+    private $handlerType     = null;
+    private $path            = null;
+    private $pathRegex       = null;
+    private $middlewares     = null;
+
+    public function __construct(string $method, $handler, string $path, array $middlewares = [], LoggerInterface $logger = null) {
+        $this->logger      = $logger ?? new NullLogger();
+        $this->method      = $method;
+        $this->handlerType = is_callable($handler) ? self::ACTION_TYPE_CALLBACK : self::ACTION_TYPE_INSTANCE_METHOD;
+        $this->path        = mb_strrpos($path, '/') === mb_strlen($path) ? rtrim($path,'/') : $path;
+
+        if ($this->handlerType === self::ACTION_TYPE_INSTANCE_METHOD) {
+            $split               = explode(self::HANDLER_SEPARATOR, $handler);
+            $this->handlerClass  = $split[0];
+            $this->handlerMethod = $split[1];
+        } else {
+            $this->handlerCallback = $handler;
+        }
+
+        $this->middlewares = new LinkedList($middlewares);
+    }
+
 
     /**
      * Get the request method, the method string will correspond to the Hrafn\Router\Method constants.
@@ -26,16 +61,16 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return string
      */
     public function getMethod(): string {
-        // TODO: Implement getMethod() method.
+        return $this->method;
     }
 
     /**
      * Get the class that will handle the message after all middlewares have been invoked.
      *
-     * @return string
+     * @return string|null
      */
-    public function getHandlerClass(): string {
-        // TODO: Implement getHandlerClass() method.
+    public function getHandlerClass(): ?string {
+        return $this->handlerClass;
     }
 
     /**
@@ -47,8 +82,8 @@ class Action implements LoggerAwareInterface, ActionInterface {
      *
      * @return string
      */
-    public function getHandlerFunction(): string {
-        // TODO: Implement getHandlerFunction() method.
+    public function getHandlerFunction(): ?string {
+        return $this->handlerMethod;
     }
 
     /**
@@ -58,7 +93,7 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return string
      */
     public function getActionType(): string {
-        // TODO: Implement getActionType() method.
+        return $this->handlerType;
     }
 
     /**
@@ -68,7 +103,7 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return string
      */
     public function getActionPath(): string {
-        // TODO: Implement getActionPath() method.
+        return $this->path;
     }
 
     /**
@@ -78,7 +113,29 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return string
      */
     public function getActionPathRegex(): string {
-        // TODO: Implement getActionPathRegex() method.
+        if ($this->pathRegex !== null) {
+            return $this->pathRegex;
+        }
+
+        $replace   = [];
+        $replace[] = sprintf('%s%s%s', self::REGEX_DELIMITER, self::PLACEHOLDER_PATTERN, self::REGEX_DELIMITER);
+        $replace[] = sprintf('%s%s%s', self::REGEX_DELIMITER, self::OPTIONAL_PLACEHOLDER_PATTERN, self::REGEX_DELIMITER);
+        $replace[] = sprintf('%s%s%s', self::REGEX_DELIMITER, '([/])', self::REGEX_DELIMITER);
+
+        $with = [
+            // named group.
+            "(?'$1'\w+)",
+            // None-capturing group with a named group inside which have optional slash at end and is optional!
+            "(?:(?'$1'\w+))?",
+            // Escaped slash.
+            '\/'
+        ];
+
+        $regex           = preg_replace($replace, $with, $this->path);
+        $regex           = preg_replace('~\\\/\(\?\:~', '[\/]?(?:', $regex);
+        $this->pathRegex = sprintf('%s^%s[\/]?$%s', self::REGEX_DELIMITER, "{$regex}", self::REGEX_DELIMITER);
+
+        return $this->pathRegex;
     }
 
     /**
@@ -88,7 +145,7 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return callable|null
      */
     public function getCallback(): ?callable {
-        // TODO: Implement getCallback() method.
+        return $this->handlerCallback;
     }
 
     /**
@@ -99,6 +156,7 @@ class Action implements LoggerAwareInterface, ActionInterface {
      */
     public function getRouteMiddlewares(): IndexedListInterface {
         // TODO: Implement getRouteMiddlewares() method.
+        // TODO: Needs tests, but requires middleware first.
     }
 
     /**
@@ -109,6 +167,6 @@ class Action implements LoggerAwareInterface, ActionInterface {
      * @return void
      */
     public function setLogger(LoggerInterface $logger) {
-        // TODO: Implement setLogger() method.
+        $this->logger = $logger;
     }
 }

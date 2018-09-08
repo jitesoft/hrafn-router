@@ -24,6 +24,7 @@
         }
     ],
     "require": {
+        "ext-mbstring": "*",
         "jitesoft/datastructures": "^3.0",
         "psr/http-message": "1.0.*",
         "psr/log": "1.0.*",
