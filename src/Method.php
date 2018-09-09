@@ -14,6 +14,7 @@ use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
  * Method
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
+ * @state Stable
  *
  * The Method class consists of a set of HTTP method constants.
  * The constant descriptions are acquired from https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
@@ -21,6 +22,11 @@ use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
  */
 final class Method {
 
+    /**
+     * Get the values of each defined method constant as an unordered indexed list.
+     *
+     * @return IndexedListInterface
+     */
     public static function getConstantValues(): IndexedListInterface {
         return new IndexedList([
             self::GET,

@@ -11,8 +11,14 @@ use Hrafn\Router\Method;
 
 /**
  * MethodToActionTrait
+ *
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
+ * @state Stable
+ *
+ * Trait which passes each http-method specific call to an abstract action method.
+ * Classes using trait have to implement the action method and should use that one instead
+ * of the specific http-method method.
  */
 trait MethodToActionTrait {
 
