@@ -7,7 +7,7 @@
 
 namespace Hrafn\Router\Contracts;
 
-use Hrafn\Router\RouteBuilder\RouteNode;
+use Hrafn\Router\RouteNode;
 
 /**
  * RouteTreeCacheInterface
