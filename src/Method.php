@@ -7,6 +7,9 @@
 
 namespace Hrafn\Router;
 
+use Jitesoft\Utilities\DataStructures\Lists\IndexedList;
+use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
+
 /**
  * Method
  * @author Johannes Tegnér <johannes@jitesoft.com>
@@ -17,6 +20,20 @@ namespace Hrafn\Router;
  * Observe that not all HTTP request methods are supported on all web servers.
  */
 final class Method {
+
+    public static function getConstantValues(): IndexedListInterface {
+        return new IndexedList([
+            self::GET,
+            self::HEAD,
+            self::POST,
+            self::PUT,
+            self::DELETE,
+            self::CONNECT,
+            self::OPTIONS,
+            self::TRACE,
+            self::PATCH
+        ]);
+    }
 
     /**
      * The GET method requests a representation of the specified resource.
