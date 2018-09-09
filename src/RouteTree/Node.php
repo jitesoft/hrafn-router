@@ -5,7 +5,7 @@
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace Hrafn\Router;
+namespace Hrafn\Router\RouteTree;
 
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
@@ -18,9 +18,9 @@ use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
  * @internal
  * @state Unstable
  */
-class RouteNode {
+class Node {
 
-    /** @var RouteNode */
+    /** @var Node */
     private $parent;
 
     /** @var MapInterface */
@@ -34,11 +34,11 @@ class RouteNode {
 
     /**
      * RouteNode constructor.
-     * @param RouteNode|null $parent
-     * @param string         $part
-     * @param null|string    $reference
+     * @param Node|null   $parent
+     * @param string      $part
+     * @param null|string $reference
      */
-    public function __construct(?RouteNode $parent, string $part, ?string $reference = null) {
+    public function __construct(?Node $parent, string $part, ?string $reference = null) {
         $this->part      = $part;
         $this->parent    = $parent;
         $this->children  = new SimpleMap();
@@ -46,16 +46,21 @@ class RouteNode {
     }
 
     /**
-     * @param RouteNode $node
+     * @param Node $node
      * @return bool
      * @throws InvalidArgumentException
      */
-    public function addChild(RouteNode $node): bool {
+    public function addChild(Node $node): bool {
         if ($this->children->has($node->getPart())) {
             return $this->children[$node->getPart()]->addChild($node);
         }
 
+        $node->setParent($this);
         return $this->children->add($node->getPart(), $node);
+    }
+
+    private function setParent(Node $parent) {
+        $this->parent = $parent;
     }
 
     /**
@@ -69,9 +74,9 @@ class RouteNode {
      * Get child with given path.
      *
      * @param string $part
-     * @return RouteNode|null
+     * @return Node|null
      */
-    public function getChild(string $part): ?RouteNode {
+    public function getChild(string $part): ?Node {
         if ($this->children->has($part)) {
             return $this->children[$part];
         }
@@ -88,9 +93,9 @@ class RouteNode {
     }
 
     /**
-     * @return RouteNode|null
+     * @return Node|null
      */
-    public function getParent(): ?RouteNode {
+    public function getParent(): ?Node {
         return $this->parent;
     }
 
