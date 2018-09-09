@@ -6,9 +6,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Parser;
 
-use function array_key_exists;
-use function array_slice;
-use function explode;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Router;
@@ -17,15 +14,9 @@ use Jitesoft\Utilities\DataStructures\Lists\IndexedList;
 use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
-use function mb_strpos;
-use function preg_match_all;
-use const PREG_PATTERN_ORDER;
-use const PREG_UNMATCHED_AS_NULL;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use function str_replace;
-use function var_dump;
 
 /**
  * RegularExpressionParser
