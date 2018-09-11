@@ -8,7 +8,6 @@
 namespace Hrafn\Router\RouteTree;
 
 use Hrafn\Router\Router;
-use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;

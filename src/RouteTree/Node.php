@@ -7,7 +7,6 @@
 
 namespace Hrafn\Router\RouteTree;
 
-use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
 
@@ -30,57 +29,67 @@ class Node {
     private $part;
 
     /** @var string|null */
-    private $reference;
+    private $references;
 
     /**
      * RouteNode constructor.
      * @param Node|null   $parent
      * @param string      $part
-     * @param null|string $reference
+     * @internal
      */
-    public function __construct(?Node $parent, string $part, ?string $reference = null) {
-        $this->part      = $part;
-        $this->parent    = $parent;
-        $this->children  = new SimpleMap();
-        $this->reference = $reference;
+    public function __construct(?Node $parent, string $part) {
+        $this->part       = $part;
+        $this->parent     = $parent;
+        $this->children   = new SimpleMap();
+        $this->references = new SimpleMap();
     }
 
     /**
-     * @param Node $node
+     * @param string $part
+     * @return Node
+     */
+    public function createChild(string $part): Node {
+        $this->children[$part] = new Node($this, $part);
+        return $this->children[$part];
+    }
+
+    /**
+     * @param string $part
      * @return bool
-     * @throws InvalidArgumentException
      */
-    public function addChild(Node $node): bool {
-        if ($this->children->has($node->getPart())) {
-            return $this->children[$node->getPart()]->addChild($node);
-        }
-
-        $node->setParent($this);
-        return $this->children->add($node->getPart(), $node);
-    }
-
-    private function setParent(Node $parent) {
-        $this->parent = $parent;
+    public function hasChild(string $part) {
+        return $this->children->has($part);
     }
 
     /**
+     * Get an action reference based on method.
+     *
+     * @param string $method
      * @return null|string
      */
-    public function getReference(): ?string {
-        return $this->reference;
+    public function getReference(string $method): ?string {
+        return $this->references->has($method) ? $this->references[$method] : null;
+    }
+
+    /**
+     * Add an action reference.
+     *
+     * @param string $method    - HTTP Method.
+     * @param string $reference - Reference as string to the action.
+     */
+    public function addReference(string $method, string $reference) {
+        $this->references[$method] = $reference;
     }
 
     /**
      * Get child with given path.
+     * If child does not exist, null will be returned.
      *
      * @param string $part
      * @return Node|null
      */
     public function getChild(string $part): ?Node {
-        if ($this->children->has($part)) {
-            return $this->children[$part];
-        }
-        return null;
+        return $this->children->has($part) ? $this->children[$part] : null;
     }
 
     /**
@@ -93,6 +102,9 @@ class Node {
     }
 
     /**
+     * Get parent node of the given node.
+     * If the node is a root node, null will be returned.
+     *
      * @return Node|null
      */
     public function getParent(): ?Node {
