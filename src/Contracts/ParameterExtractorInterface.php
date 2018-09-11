@@ -6,8 +6,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Contracts;
 
-use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
+use Psr\Log\LoggerAwareInterface;
 
 /**
  * Interface used for parameter and path extraction.
@@ -15,10 +15,8 @@ use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
  * RouteParserInterface
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
- * @state Stable
  */
-interface ParameterExtractorInterface {
-
+interface ParameterExtractorInterface extends LoggerAwareInterface {
 
     /**
      * Get parameters from a path using a specified pattern.

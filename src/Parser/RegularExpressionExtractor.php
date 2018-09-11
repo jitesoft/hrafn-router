@@ -10,10 +10,10 @@ use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Router;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
-use Jitesoft\Utilities\DataStructures\Lists\IndexedList;
-use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
+use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
+use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -23,7 +23,7 @@ use Psr\Log\NullLogger;
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-class RegularExpressionExtractor implements ParameterExtractorInterface, PathExtractorInterface, LoggerAwareInterface {
+class RegularExpressionExtractor implements ParameterExtractorInterface, PathExtractorInterface {
 
     private $placeholderPattern;
     private $optionalPlaceholderPattern;
@@ -49,7 +49,7 @@ class RegularExpressionExtractor implements ParameterExtractorInterface, PathExt
         $this->logger                     = $logger ?? new NullLogger();
     }
 
-    public function getUriParts(string $path): IndexedListInterface {
+    public function getUriParts(string $path): QueueInterface {
         $this->logger->debug('{tag} Extracting URI Paths from the supplied route path.', [
             'tag' => Router::LOG_TAG
         ]);
@@ -59,7 +59,7 @@ class RegularExpressionExtractor implements ParameterExtractorInterface, PathExt
             sprintf($format, $this->regexDelimiter, $this->optionalPlaceholderPattern, $this->regexDelimiter)
         ];
 
-        $path = preg_replace($replace, '%$1%', $path);
+        $path = preg_replace($replace, '%PARAM%', $path);
         $list = explode('/', $path);
         $this->logger->debug('{tag} Extracted {count} parts from the path.', [
             'tag' => Router::LOG_TAG,
@@ -73,7 +73,9 @@ class RegularExpressionExtractor implements ParameterExtractorInterface, PathExt
             array_pop($list);
         }
 
-        return new IndexedList($list);
+        $queue = new LinkedQueue();
+        $queue->enqueue(...$list);
+        return $queue;
     }
 
     private function getOptionalParameterNames(string $pattern): array {
