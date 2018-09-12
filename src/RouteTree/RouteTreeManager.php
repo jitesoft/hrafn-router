@@ -85,6 +85,7 @@ class RouteTreeManager implements LoggerAwareInterface {
      * @param LoggerInterface $logger
      *
      * @return void
+     * @codeCoverageIgnore
      */
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;

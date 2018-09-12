@@ -7,34 +7,81 @@
 
 namespace Hrafn\Router;
 
-use Hrafn\Router\Contracts\ActionNamespaceBuilderInterface;
-use Hrafn\Router\Traits\MethodToActionTrait;
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use Hrafn\Router\{
+    Contracts\ActionInterface,
+    Contracts\RouteBuilderInterface,
+    Contracts\PathExtractorInterface,
+    Parser\RegularExpressionExtractor,
+    RouteTree\Node,
+    RouteTree\RouteTreeManager
+};
+use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
+use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
+use Jitesoft\Exceptions\Logic\InvalidArgumentException;
+use Jitesoft\Utilities\DataStructures\Maps\ {
+    MapInterface,
+    SimpleMap
+};
+use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
+use Psr\ {
+    Container\ContainerInterface,
+    Http\Message\ResponseInterface,
+    Http\Message\ServerRequestInterface,
+    Http\Server\RequestHandlerInterface,
+    Log\LoggerAwareInterface,
+    Log\LoggerInterface,
+    Log\NullLogger
+};
+
 
 /**
  * Router
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-class Router implements LoggerAwareInterface, RequestHandlerInterface, ActionNamespaceBuilderInterface {
-    use MethodToActionTrait;
+class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
-    private const LOG_TAG = 'Hrafn\Router:';
-
+    /** @var string */
+    public const LOG_TAG = 'Hrafn\Router:';
+    /** @var LoggerInterface */
     private $logger;
+    /** @var MapInterface|ContainerInterface */
     private $container;
+    /** @var RouteBuilderInterface  */
+    private $routeBuilder;
+    /** @var SimpleMap */
+    private $actions;
+    /** @var RouteTreeManager */
+    private $routeTreeManager;
+    /** @var PathExtractorInterface */
+    private $pathExtractor;
+    /** @var Node */
+    private $rootNode;
 
-    public function __construct(ContainerInterface $container) {
-        $this->container = $container;
+    public function __construct(?ContainerInterface $container = null) {
+        $this->container = $container ?? new SimpleMap();
         $this->logger    = $this->container->has(LoggerInterface::class)
             ? $container->get(LoggerInterface::class)
             : new NullLogger();
+
+        if (!$this->container->has(PathExtractorInterface::class)) {
+            $this->pathExtractor = new RegularExpressionExtractor('\{(\w+?)\}', '\{\?(\w+)\}', '~', $this->logger);
+        } else {
+            $this->pathExtractor = $container->get(PathExtractorInterface::class);
+        }
+
+        $this->routeTreeManager = new RouteTreeManager($this->logger);
+        $this->actions          = new SimpleMap();
+        $this->rootNode         = new Node(null, '/');
+        $this->routeBuilder     = new RouteBuilder(
+            [],
+            $this->rootNode,
+            $this->pathExtractor,
+            $this->routeTreeManager,
+            '',
+            $this->logger,
+            $this->actions
+        );
     }
 
     /**
@@ -45,43 +92,60 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface, ActionNam
      */
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;
+        $this->routeBuilder->setLogger($logger);
+        $this->routeTreeManager->setLogger($logger);
+        $this->pathExtractor->setLogger($logger);
+    }
+
+    /**
+     * @return RouteBuilderInterface
+     */
+    public function getBuilder() {
+        return $this->routeBuilder;
     }
 
     /**
      * Handle the request and return a response.
+     *
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpNotFoundException
+     * @throws InvalidArgumentException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
-        // TODO: Implement handle() method.
+        $uri   = $request->getUri()->getPath();
+        $parts = $this->pathExtractor->getUriParts($uri);
+        $node  = $this->getNode($this->rootNode, $parts);
+
+        $reference = $node->getReference(mb_strtolower($request->getMethod()));
+
+        if (!$reference) {
+            throw new HttpMethodNotAllowedException();
+        }
+
+        if (!$this->actions->has($reference)) {
+            throw new HttpNotFoundException();
+        }
+
+        /** @var ActionInterface $action */
+        $action = $this->actions->get($reference);
     }
 
     /**
-     * Create a new namespace inside of current namespace.
-     * The new GroupInterface instance is passed as the single argument to the $closure callback.
-     *
-     * @param string     $pattern
-     * @param array|null $middleWares
-     * @param callable   $closure
-     * @return ActionNamespaceBuilderInterface
+     * @param Node           $parent
+     * @param QueueInterface $parts
+     * @return Node
+     * @throws HttpNotFoundException
      */
-    public function namespace(string $pattern, ?array $middleWares, callable $closure): ActionNamespaceBuilderInterface {
-        // TODO: Implement namespace() method.
+    private function getNode(Node $parent, QueueInterface $parts): Node {
+        $part = $parts->dequeue();
+        if ($parts === null || !$parent->hasChild($part)) {
+            throw new HttpNotFoundException();
+        }
+
+        $node = $parent->getChild($parent);
+        return ($parts->peek() === null) ? $node : $this->getNode($node, $parts);
     }
 
-    /**
-     * Method which all the http-method specific methods forward data to.
-     *
-     * @param string $method
-     * @param string $pattern
-     * @param        $handler
-     * @param array  $middleWares
-     * @return ActionNamespaceBuilderInterface
-     */
-    protected function action(string $method,
-                              string $pattern,
-                              $handler,
-                              $middleWares = []): ActionNamespaceBuilderInterface {
-        // TODO: Implement action() method.
-    }
 }

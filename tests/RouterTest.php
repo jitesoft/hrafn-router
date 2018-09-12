@@ -7,6 +7,7 @@
 
 namespace Hrafn\Router\Tests;
 
+use Hrafn\Router\Router;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,4 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RouterTest extends TestCase {
 
+    public function testHi() {
+        $r = new Router();
+    }
 }

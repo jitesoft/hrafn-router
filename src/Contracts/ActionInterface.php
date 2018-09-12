@@ -9,14 +9,14 @@ namespace Hrafn\Router\Contracts;
 
 use Hrafn\Router\Method;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerAwareInterface;
 
 /**
  * ActionInterface
+ *
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-interface ActionInterface extends LoggerAwareInterface {
+interface ActionInterface {
 
     /**
      * Get the request method, the method string will correspond to the Hrafn\Router\Method constants.

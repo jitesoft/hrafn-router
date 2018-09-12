@@ -6,7 +6,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\RequestHandler;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -20,12 +19,10 @@ class ClassHandler implements RequestHandlerInterface {
 
     private $className;
     private $classMethod;
-    private $container;
 
-    public function __construct(string $className, string $classMethod, ContainerInterface $container) {
+    public function __construct(string $className, string $classMethod) {
         $this->className   = $className;
         $this->classMethod = $classMethod;
-        $this->container   = $container;
     }
 
     /**

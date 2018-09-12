@@ -1,6 +1,6 @@
 <?php
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  GroupInterface.php - Part of the router project.
+  RouteBuilderInterface.php - Part of the router project.
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -8,12 +8,12 @@
 namespace Hrafn\Router\Contracts;
 
 /**
- * Interface for classes which creates and contains namespace for a set of actions.
+ * Interface for classes which creates and contains routes for a set of actions.
  *
  * @author Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
-interface ActionNamespaceBuilderInterface {
+interface RouteBuilderInterface {
 
     /**
      * Create a get action.
@@ -21,7 +21,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function get(string $pattern, $handler, $middleWares = []): self;
 
@@ -31,7 +31,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function head(string $pattern, $handler, $middleWares = []): self;
 
@@ -41,7 +41,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function post(string $pattern, $handler, $middleWares = []): self;
 
@@ -51,7 +51,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function put(string $pattern, $handler, $middleWares = []): self;
 
@@ -61,7 +61,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function delete(string $pattern, $handler, $middleWares = []): self;
 
@@ -71,7 +71,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function connect(string $pattern, $handler, $middleWares = []): self;
 
@@ -81,7 +81,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function options(string $pattern, $handler, $middleWares = []): self;
 
@@ -91,7 +91,7 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function trace(string $pattern, $handler, $middleWares = []): self;
 
@@ -101,19 +101,31 @@ interface ActionNamespaceBuilderInterface {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     public function patch(string $pattern, $handler, $middleWares = []): self;
 
     /**
      * Create a new namespace inside of current namespace.
-     * The new GroupInterface instance is passed as the single argument to the $closure callback.
+     * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      *
      * @param string     $pattern
      * @param array|null $middleWares
      * @param callable   $closure
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function namespace(string $pattern, ?array $middleWares, callable $closure): self;
+    public function namespace(string $pattern, callable $closure, ?array $middleWares): self;
+
+    /**
+     * Create a new group inside of current group.
+     * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
+     * @alias namespace
+     *
+     * @param string     $pattern
+     * @param callable   $closure
+     * @param array|null $middleWares
+     * @return RouteBuilderInterface
+     */
+    public function group(string $pattern, callable $closure, ?array $middleWares): self;
 
 }

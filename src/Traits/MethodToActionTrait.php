@@ -6,7 +6,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Traits;
 
-use Hrafn\Router\Contracts\ActionNamespaceBuilderInterface;
+use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\Method;
 
 /**
@@ -29,13 +29,13 @@ trait MethodToActionTrait {
      * @param string $pattern
      * @param        $handler
      * @param array  $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
     protected abstract function action(string $method,
                                        string $pattern,
                                        $handler,
                                        $middleWares = []
-    ): ActionNamespaceBuilderInterface;
+    ): RouteBuilderInterface;
 
     /**
      * Create a get action.
@@ -43,9 +43,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function get(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function get(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::GET, $pattern, $handler, $middleWares);
     }
 
@@ -55,9 +55,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function head(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function head(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::HEAD, $pattern, $handler, $middleWares);
     }
 
@@ -67,9 +67,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function post(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function post(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::POST, $pattern, $handler, $middleWares);
     }
 
@@ -79,9 +79,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function put(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function put(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::PUT, $pattern, $handler, $middleWares);
     }
 
@@ -91,9 +91,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function delete(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function delete(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::DELETE, $pattern, $handler, $middleWares);
     }
 
@@ -103,9 +103,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function connect(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function connect(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::CONNECT, $pattern, $handler, $middleWares);
     }
 
@@ -115,9 +115,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function options(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function options(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::OPTIONS, $pattern, $handler, $middleWares);
     }
 
@@ -127,9 +127,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function trace(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function trace(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::TRACE, $pattern, $handler, $middleWares);
     }
 
@@ -139,9 +139,9 @@ trait MethodToActionTrait {
      * @param string          $pattern
      * @param string|callable $handler
      * @param array           $middleWares
-     * @return ActionNamespaceBuilderInterface
+     * @return RouteBuilderInterface
      */
-    public function patch(string $pattern, $handler, $middleWares = []): ActionNamespaceBuilderInterface {
+    public function patch(string $pattern, $handler, $middleWares = []): RouteBuilderInterface {
         return $this->action(Method::PATCH, $pattern, $handler, $middleWares);
     }
 

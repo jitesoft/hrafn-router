@@ -6,7 +6,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\RequestHandler;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -19,11 +18,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 class CallbackHandler implements RequestHandlerInterface {
 
     private $callback;
-    private $container;
 
-    public function __construct(callable $callback, ContainerInterface $container) {
-        $this->callback  = $callback;
-        $this->container = $container;
+    public function __construct(callable $callback) {
+        $this->callback = $callback;
     }
 
     /**

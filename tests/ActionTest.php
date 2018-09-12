@@ -29,7 +29,7 @@ class ActionTest extends TestCase {
 
     public function testGetMethod() {
         Arrays::forEach(Method::getConstantValues(), function($method) {
-            $action = new Action($method, 'Handler@method', '/test', [], new Container());
+            $action = new Action($method, 'Handler@method', '/test', []);
             $this->assertEquals($method, $action->getMethod());
         });
     }
@@ -41,7 +41,7 @@ class ActionTest extends TestCase {
 
             }),
             new ActionTestTestMiddleware()
-        ], new Container());
+        ]);
 
         $queue = $action->getMiddlewares();
         $this->assertCount(3, $queue);
@@ -52,9 +52,9 @@ class ActionTest extends TestCase {
 
     public function testGetPattern() {
 
-        $action = new Action('get', 'Handler@method', '/test', [], new Container());
+        $action = new Action('get', 'Handler@method', '/test', []);
         $this->assertEquals('/test', $action->getPattern());
-        $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', [], new Container());
+        $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', []);
         $this->assertEquals('/test/{with}/{?params}', $action->getPattern());
     }
 
@@ -62,12 +62,12 @@ class ActionTest extends TestCase {
         $handler = function($r) {
 
         };
-        $action = new Action('get', $handler, '/test', [], new Container());
+        $action = new Action('get', $handler, '/test', []);
         $this->assertInstanceOf(CallbackHandler::class, $action->getHandler());
     }
 
     public function testGetHandlerClass() {
-        $action = new Action('get', 'Handler@method', '/test', [], new Container());
+        $action = new Action('get', 'Handler@method', '/test', []);
         $this->assertInstanceOf(ClassHandler::class, $action->getHandler());
     }
 

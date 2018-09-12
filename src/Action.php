@@ -26,12 +26,10 @@ use Psr\Log\NullLogger;
 class Action implements ActionInterface {
     private const HANDLER_SEPARATOR = '@';
 
-    private $logger      = null;
     private $method      = null;
     private $handler     = null;
     private $pattern     = null;
     private $middlewares = null;
-    private $container   = null;
 
     /**
      * Action constructor.
@@ -39,28 +37,21 @@ class Action implements ActionInterface {
      * @param string|callable    $handler
      * @param string             $pattern
      * @param array              $middlewares
-     * @param ContainerInterface $container
      * @internal
      */
     public function __construct(string $method,
                                 $handler,
                                 string $pattern,
-                                array $middlewares,
-                                ContainerInterface $container) {
+                                array $middlewares) {
 
-        $this->logger = $container->has(LoggerInterface::class)
-            ? $container->get(LoggerInterface::class)
-            : new NullLogger();
-
-        $this->container = $container;
-        $this->method    = $method;
-        $this->pattern   = $pattern;
+        $this->method  = $method;
+        $this->pattern = $pattern;
 
         if (is_callable($handler)) {
-            $this->handler = new CallbackHandler($handler, $container);
+            $this->handler = new CallbackHandler($handler);
         } else {
             $handlerSplit  = explode(self::HANDLER_SEPARATOR, $handler);
-            $this->handler = new ClassHandler($handlerSplit[0], $handlerSplit[1], $container);
+            $this->handler = new ClassHandler($handlerSplit[0], $handlerSplit[1]);
         }
 
         $this->middlewares = new LinkedQueue();
@@ -97,17 +88,6 @@ class Action implements ActionInterface {
      */
     public function getPattern(): string {
         return $this->pattern;
-    }
-
-    /**
-     * Sets a logger instance on the object.
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger) {
-        $this->logger = $logger;
     }
 
     /**

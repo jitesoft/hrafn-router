@@ -24,10 +24,12 @@ class AnonymousMiddlewareTest extends TestCase {
     public function testAll() {
 
         $called     = false;
-        $middleware = new AnonymousMiddleware(function(ServerRequestInterface $request, RequestHandlerInterface $handler) use (&$called) {
-            $called = true;
-            return $handler->handle($request);
-        });
+        $middleware = new AnonymousMiddleware(
+            function(ServerRequestInterface $request, RequestHandlerInterface $handler) use (&$called) {
+                $called = true;
+                return $handler->handle($request);
+            }
+        );
 
         $middleware->process(new ServerRequest('GET', 'https://example.com'), new RequestHandlerTestClass());
         $this->assertTrue($called);

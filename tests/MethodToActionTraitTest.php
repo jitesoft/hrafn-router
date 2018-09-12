@@ -6,7 +6,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Traits;
 
-use Hrafn\Router\Contracts\ActionNamespaceBuilderInterface;
+use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\Method;
 use PHPUnit\Framework\TestCase;
 
@@ -145,7 +145,7 @@ class MethodToActionTraitTest extends TestCase {
  * @property $handler
  * @property $middlewares
  */
-class MethodToActionTraitTestImplementation implements ActionNamespaceBuilderInterface {
+class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
     use MethodToActionTrait;
     /** @var bool */
     public $called = false;
@@ -163,7 +163,7 @@ class MethodToActionTraitTestImplementation implements ActionNamespaceBuilderInt
     protected function action(string $method,
                               string $pattern,
                               $handler,
-                              $middleWares = []): ActionNamespaceBuilderInterface {
+                              $middleWares = []): RouteBuilderInterface {
         $this->errors = [];
         $this->called = true;
 
@@ -188,6 +188,19 @@ class MethodToActionTraitTestImplementation implements ActionNamespaceBuilderInt
         return $this->errors;
     }
 
-    public function namespace(string $pattern, ?array $middleWares, callable $closure): ActionNamespaceBuilderInterface { }
+    public function namespace(string $pattern, callable $closure,  ?array $middleWares): RouteBuilderInterface { }
 
+    /**
+     * Create a new group inside of current group.
+     * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
+     * @alias namespace
+     *
+     * @param string     $pattern
+     * @param callable   $closure
+     * @param array|null $middleWares
+     * @return RouteBuilderInterface
+     */
+    public function group(string $pattern, callable $closure, ?array $middleWares): RouteBuilderInterface {
+        $this->namespace($pattern, $closure, $middleWares);
+    }
 }

@@ -88,6 +88,7 @@ final class Method {
      */
     public const PATCH = 'patch';
 
+    /** @codeCoverageIgnore */
     private function __construct() {
         // Not a instantiable class!
     }
