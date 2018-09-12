@@ -7,8 +7,9 @@
 namespace Hrafn\Router\Tests;
 
 use Hrafn\Router\Contracts\PathExtractorInterface;
-use Hrafn\Router\Parser\RegularExpressionExtractor;
+use Hrafn\Router\Parser\RegexPathExtractor;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * PathExtractorTest
@@ -22,11 +23,10 @@ class PathExtractorTest extends TestCase {
     protected function setUp() {
         parent::setUp();
 
-        $this->extractor = new RegularExpressionExtractor();
+        $this->extractor = new RegexPathExtractor(new NullLogger());
     }
 
     public function testExtractPath() {
-        $this->expectNotToPerformAssertions();
         $path = '/test/path/without/parameters';
         $out  = $this->extractor->getUriParts($path);
 
@@ -36,10 +36,10 @@ class PathExtractorTest extends TestCase {
                 $this->fail(sprintf('Expected value "%s" did not match "%s".', $partName, $value));
             }
         }
+        $this->assertTrue(true);
     }
 
     public function testExtractPathWithParameter() {
-        $this->expectNotToPerformAssertions();
         $path = '/test/path/with/{some}/parameters/{?right}';
         $out  = $this->extractor->getUriParts($path);
 
@@ -49,10 +49,10 @@ class PathExtractorTest extends TestCase {
                 $this->fail(sprintf('Expected value "%s" did not match "%s".', $partName, $value));
             }
         }
+        $this->assertTrue(true);
     }
 
     public function testTrailingSlash() {
-        $this->expectNotToPerformAssertions();
         $path = '/test/path/without/parameters/';
         $out  = $this->extractor->getUriParts($path);
 
@@ -62,10 +62,10 @@ class PathExtractorTest extends TestCase {
                 $this->fail(sprintf('Expected value "%s" did not match "%s".', $partName, $value));
             }
         }
+        $this->assertTrue(true);
     }
 
     public function testTrailingSlashWithParameter() {
-        $this->expectNotToPerformAssertions();
         $path = '/test/path/with/{some}/parameters/{?right}/';
         $out  = $this->extractor->getUriParts($path);
 
@@ -75,10 +75,10 @@ class PathExtractorTest extends TestCase {
                 $this->fail(sprintf('Expected value "%s" did not match "%s".', $partName, $value));
             }
         }
+        $this->assertTrue(true);
     }
 
     public function testOmittedSlash() {
-        $this->expectNotToPerformAssertions();
         $path = 'test/path/without/parameters';
         $out  = $this->extractor->getUriParts($path);
 
@@ -88,6 +88,7 @@ class PathExtractorTest extends TestCase {
                 $this->fail(sprintf('Expected value "%s" did not match "%s".', $partName, $value));
             }
         }
+        $this->assertTrue(true);
     }
 
 }

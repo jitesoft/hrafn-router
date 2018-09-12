@@ -7,9 +7,10 @@
 namespace Hrafn\Router\Tests\Parser;
 
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
-use Hrafn\Router\Parser\RegularExpressionExtractor;
+use Hrafn\Router\Parser\RegexParameterExtractor;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * ParameterExtractorTest
@@ -24,7 +25,7 @@ class ParameterExtractorTest extends TestCase {
     protected function setUp() {
         parent::setUp();
 
-        $this->extractor = new RegularExpressionExtractor();
+        $this->extractor = new RegexParameterExtractor(new NullLogger());
     }
 
     public function testExtractWithoutParameters() {

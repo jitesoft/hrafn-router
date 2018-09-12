@@ -7,14 +7,14 @@
 
 namespace Hrafn\Router;
 
-use Hrafn\Router\{
-    Contracts\ActionInterface,
+use Hrafn\Router\{Contracts\ActionInterface,
+    Contracts\ParameterExtractorInterface,
     Contracts\RouteBuilderInterface,
     Contracts\PathExtractorInterface,
-    Parser\RegularExpressionExtractor,
+    Parser\RegexParameterExtractor as ParamExtractor,
+    Parser\RegexPathExtractor as PathExtractor,
     RouteTree\Node,
-    RouteTree\RouteTreeManager
-};
+    RouteTree\RouteTreeManager};
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
@@ -55,20 +55,21 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     private $routeTreeManager;
     /** @var PathExtractorInterface */
     private $pathExtractor;
+    /** @var ParameterExtractorInterface */
+    private $paramExtractor;
     /** @var Node */
     private $rootNode;
 
     public function __construct(?ContainerInterface $container = null) {
         $this->container = $container ?? new SimpleMap();
-        $this->logger    = $this->container->has(LoggerInterface::class)
-            ? $container->get(LoggerInterface::class)
-            : new NullLogger();
 
-        if (!$this->container->has(PathExtractorInterface::class)) {
-            $this->pathExtractor = new RegularExpressionExtractor('\{(\w+?)\}', '\{\?(\w+)\}', '~', $this->logger);
-        } else {
-            $this->pathExtractor = $container->get(PathExtractorInterface::class);
-        }
+        $getOrNull = function($name) use($container) {
+            return $this->container->has($name) ? $this->container->get($name) : null;
+        };
+
+        $this->logger         = $getOrNull(LoggerInterface::class) ?? new NullLogger();
+        $this->pathExtractor  = $getOrNull(PathExtractorInterface::class) ?? new PathExtractor($this->logger);
+        $this->paramExtractor = $getOrNull(ParameterExtractorInterface::class) ?? new ParamExtractor($this->logger);
 
         $this->routeTreeManager = new RouteTreeManager($this->logger);
         $this->actions          = new SimpleMap();
