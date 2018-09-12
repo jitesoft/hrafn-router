@@ -45,8 +45,8 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
                                 ?PathExtractorInterface $pathExtractor = null,
                                 ?LoggerInterface $logger = null) {
 
-        $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor($logger);
         $this->logger        = $logger ?? new NullLogger();
+        $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor($this->logger);
         $this->root          = $rootNode;
         $this->actions       = $actions;
     }
@@ -64,7 +64,7 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
             throw new HttpNotFoundException();
         }
 
-        $node = $parent->getChild($parent);
+        $node = $parent->getChild($part);
         return ($parts->peek() === null) ? $node : $this->getNode($node, $parts);
     }
 
@@ -89,7 +89,7 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
         }
 
         /** @var ActionInterface $action */
-        return $this->actions[$reference];
+        return $this->actions[$reference]->getHandler();
     }
 
     /**

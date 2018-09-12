@@ -7,6 +7,8 @@
 
 namespace Hrafn\Router\Contracts;
 
+use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
+use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
@@ -20,7 +22,9 @@ interface DispatcherInterface {
     /**
      * @param string $method
      * @param string $target
-     * @return mixed
+     * @return RequestHandlerInterface
+     * @throws HttpNotFoundException
+     * @throws HttpMethodNotAllowedException
      */
     public function dispatch(string $method, string $target): RequestHandlerInterface;
 
