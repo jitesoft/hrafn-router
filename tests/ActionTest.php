@@ -9,11 +9,16 @@ namespace Hrafn\Router\Tests;
 
 use Hrafn\Router\Action;
 use Hrafn\Router\Method;
-use function is_callable;
+use Hrafn\Router\Middleware\AnonymousMiddleware;
+use Hrafn\Router\RequestHandler\CallbackHandler;
+use Hrafn\Router\RequestHandler\ClassHandler;
+use Jitesoft\Container\Container;
+use Jitesoft\Utilities\DataStructures\Arrays;
 use PHPUnit\Framework\TestCase;
-use function preg_match;
-use function preg_match_all;
-use function var_dump;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * ActionTest
@@ -22,96 +27,54 @@ use function var_dump;
  */
 class ActionTest extends TestCase {
 
-    private const METHODS = [
-        Method::GET,
-        Method::HEAD,
-        Method::POST,
-        Method::PUT,
-        Method::DELETE,
-        Method::CONNECT,
-        Method::OPTIONS,
-        Method::TRACE,
-        Method::PATCH
-    ];
-
     public function testGetMethod() {
-        foreach (self::METHODS as $method) {
-            $action = new Action($method, 'Handler@method', '/test');
+        Arrays::forEach(Method::getConstantValues(), function($method) {
+            $action = new Action($method, 'Handler@method', '/test', [], new Container());
             $this->assertEquals($method, $action->getMethod());
-        }
+        });
+    }
+
+    public function testGetMiddlewares() {
+        $action = new Action(Method::POST, 'handler@method', '/test', [
+            new ActionTestTestMiddleware(),
+            new AnonymousMiddleware(function($request, $handler) {
+
+            }),
+            new ActionTestTestMiddleware()
+        ], new Container());
+
+        $queue = $action->getMiddlewares();
+        $this->assertCount(3, $queue);
+        $this->assertInstanceOf(ActionTestTestMiddleware::class, $queue->dequeue());
+        $this->assertInstanceOf(AnonymousMiddleware::class, $queue->dequeue());
+        $this->assertInstanceOf(ActionTestTestMiddleware::class, $queue->dequeue());
+    }
+
+    public function testGetPattern() {
+
+        $action = new Action('get', 'Handler@method', '/test', [], new Container());
+        $this->assertEquals('/test', $action->getPattern());
+        $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', [], new Container());
+        $this->assertEquals('/test/{with}/{?params}', $action->getPattern());
+    }
+
+    public function testGetHandlerCallback() {
+        $handler = function($r) {
+
+        };
+        $action = new Action('get', $handler, '/test', [], new Container());
+        $this->assertInstanceOf(CallbackHandler::class, $action->getHandler());
     }
 
     public function testGetHandlerClass() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('className', $action->getHandlerClass());
+        $action = new Action('get', 'Handler@method', '/test', [], new Container());
+        $this->assertInstanceOf(ClassHandler::class, $action->getHandler());
     }
 
-    public function testGetHandlerClassFailure() {
-        $action = new Action('get', function() {}, '/test');
-        $this->assertNull($action->getHandlerClass());
+}
+
+class ActionTestTestMiddleware implements MiddlewareInterface {
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
+        return null;
     }
-
-    public function testGetHandlerFunction() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('classMethod', $action->getHandlerFunction());
-    }
-
-    public function testGetHandlerFunctionFailure() {
-        $action = new Action('get', function() {}, '/test');
-        $this->assertNull($action->getHandlerFunction());
-    }
-
-    public function testGetCallback() {
-        $action   = new Action('get', function() { return 15; }, '/test');
-        $callback = $action->getCallback();
-
-        $this->assertTrue(is_callable($callback));
-        $this->assertEquals(15, $callback());
-    }
-
-    public function testGetCallbackFailure() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertNull($action->getCallback());
-    }
-
-    public function testGetActionType() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('instance_method', $action->getActionType());
-        $action = new Action('get', function() { return 15; }, '/test');
-        $this->assertEquals('callback', $action->getActionType());
-    }
-
-    public function testGetActionPath() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('/test', $action->getActionPath());
-        $action = new Action('get', 'className@classMethod', '/test/{with}/param');
-        $this->assertEquals('/test/{with}/param', $action->getActionPath());
-    }
-
-    public function testGetActionPathRegex() {
-        $action = new Action('get', 'className@classMethod', '/test');
-        $this->assertEquals('~^\/test[\/]?$~', $action->getActionPathRegex());
-        $action = new Action('get', 'className@classMethod', '/test/{with}/param/{?optional}');
-        $this->assertEquals("~^\/test\/(?'with'\w+)\/param[\/]?(?:(?'optional'\w+))?[\/]?$~", $action->getActionPathRegex());
-
-        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/');
-        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc');
-
-        $action = new Action('get', 'className@classMethod', '/test/{with}/param/{?optional}/{?again}');
-        $this->assertEquals("~^\/test\/(?'with'\w+)\/param[\/]?(?:(?'optional'\w+))?[\/]?(?:(?'again'\w+))?[\/]?$~", $action->getActionPathRegex());
-
-        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc');
-        $this->assertRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc/');
-        $this->assertNotRegExp($action->getActionPathRegex(), '/test/abc123/param/something/abc/abc');
-    }
-
 }

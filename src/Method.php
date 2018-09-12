@@ -25,10 +25,10 @@ final class Method {
     /**
      * Get the values of each defined method constant as an unordered indexed list.
      *
-     * @return IndexedListInterface
+     * @return array
      */
-    public static function getConstantValues(): IndexedListInterface {
-        return new IndexedList([
+    public static function getConstantValues(): array {
+        return [
             self::GET,
             self::HEAD,
             self::POST,
@@ -38,7 +38,7 @@ final class Method {
             self::OPTIONS,
             self::TRACE,
             self::PATCH
-        ]);
+        ];
     }
 
     /**

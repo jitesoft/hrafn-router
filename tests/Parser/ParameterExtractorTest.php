@@ -4,7 +4,7 @@
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-namespace Hrafn\Router\Tests;
+namespace Hrafn\Router\Tests\Parser;
 
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Parser\RegularExpressionExtractor;
@@ -64,8 +64,6 @@ class ParameterExtractorTest extends TestCase {
             'another' => 'abc321',
             'again' => 'cde123'
         ],$output->toAssocArray());
-
-
     }
 
     public function testExtractWithMultipleOptionalParameters() {
@@ -117,7 +115,9 @@ class ParameterExtractorTest extends TestCase {
         $path    = '/path/with/abc123';
         $pattern = '/path/with/{parameter}/{required}';
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Error when trying to match pattern "/path/with/{parameter}/{required}" with path "/path/with/abc123", Could not match all parameters.');
+        $this->expectExceptionMessage(
+            'Error when trying to match pattern "/path/with/{parameter}/{required}" with path "/path/with/abc123", Could not match all parameters.'
+        );
         $this->extractor->getUriParameters($pattern, $path);
     }
 
