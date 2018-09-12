@@ -8,9 +8,11 @@
 namespace Hrafn\Router;
 
 use Hrafn\Router\{Contracts\ActionInterface,
+    Contracts\DispatcherInterface,
     Contracts\ParameterExtractorInterface,
     Contracts\RouteBuilderInterface,
     Contracts\PathExtractorInterface,
+    Dispatcher\DefaultDispatcher,
     Parser\RegexParameterExtractor as ParamExtractor,
     Parser\RegexPathExtractor as PathExtractor,
     RouteTree\Node,
@@ -90,6 +92,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      *
      * @param LoggerInterface $logger
      * @return void
+     * @codeCoverageIgnore
      */
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;
@@ -115,38 +118,19 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * @throws InvalidArgumentException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
-        $uri   = $request->getUri()->getPath();
-        $parts = $this->pathExtractor->getUriParts($uri);
-        $node  = $this->getNode($this->rootNode, $parts);
-
-        $reference = $node->getReference(mb_strtolower($request->getMethod()));
-
-        if (!$reference) {
-            throw new HttpMethodNotAllowedException();
+        $dispatcher = null;
+        if ($this->container->has(DispatcherInterface::class)) {
+            $this->container->get(DispatcherInterface::class);
+        } else {
+            $dispatcher = new DefaultDispatcher(
+                $this->rootNode,
+                $this->actions,
+                $this->pathExtractor,
+                $this->logger
+            );
         }
 
-        if (!$this->actions->has($reference)) {
-            throw new HttpNotFoundException();
-        }
-
-        /** @var ActionInterface $action */
-        $action = $this->actions->get($reference);
-    }
-
-    /**
-     * @param Node           $parent
-     * @param QueueInterface $parts
-     * @return Node
-     * @throws HttpNotFoundException
-     */
-    private function getNode(Node $parent, QueueInterface $parts): Node {
-        $part = $parts->dequeue();
-        if ($parts === null || !$parent->hasChild($part)) {
-            throw new HttpNotFoundException();
-        }
-
-        $node = $parent->getChild($parent);
-        return ($parts->peek() === null) ? $node : $this->getNode($node, $parts);
+        $action = $dispatcher->dispatch($request->getMethod(), $request->getRequestTarget());
     }
 
 }

@@ -11,7 +11,6 @@ use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\RouteTree\Node;
 use Hrafn\Router\RouteTree\RouteTreeManager;
 use Hrafn\Router\Traits\MethodToActionTrait;
-use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;

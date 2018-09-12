@@ -29,4 +29,5 @@ class CallbackHandler implements RequestHandlerInterface {
     public function handle(ServerRequestInterface $request): ResponseInterface {
         // TODO: Implement handle() method.
     }
+
 }
