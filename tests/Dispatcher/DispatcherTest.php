@@ -9,12 +9,14 @@ namespace Hrafn\Router\Tests\Dispatcher;
 
 use Hrafn\Router\Action;
 use Hrafn\Router\Dispatcher\DefaultDispatcher;
-use Hrafn\Router\RequestHandler\CallbackHandler;
+use Hrafn\Router\Parser\RegexParameterExtractor;
+use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RouteTree\Node;
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  * DefaultDispatcherTest
@@ -56,11 +58,11 @@ class DispatcherTest extends TestCase {
         $c->addReference('post', 'post::/test');
 
         $dispatcher = new DefaultDispatcher($root, new SimpleMap([
-            sprintf('%s::%s/%s', 'post', '', 'test') => new Action('post', function() {}, '/test', [])
+            sprintf('%s::%s/%s', 'post', '', 'test') => new Action('post', function() {}, '/test', [], new RegexParameterExtractor(new NullLogger()))
         ]));
 
         $handler = $dispatcher->dispatch('post', '/test');
-        $this->assertInstanceOf(CallbackHandler::class, $handler);
+        $this->assertInstanceOf(ReflectionCallbackHandler::class, $handler);
     }
 
 

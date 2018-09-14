@@ -6,6 +6,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router;
 
+use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\RouteTree\Node;
@@ -30,32 +31,36 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     private $basePattern;
     private $logger;
     private $actionContainer;
+    private $parameterExtractor;
 
     /**
      * RouteBuilder constructor.
-     * @param array                  $middlewares
-     * @param Node                   $node
-     * @param PathExtractorInterface $extractor
-     * @param RouteTreeManager       $manager
-     * @param string                 $basePattern
-     * @param LoggerInterface        $logger
-     * @param MapInterface           $actionContainer
+     * @param array                       $middlewares
+     * @param Node                        $node
+     * @param PathExtractorInterface      $extractor
+     * @param ParameterExtractorInterface $parameterExtractor
+     * @param RouteTreeManager            $manager
+     * @param string                      $basePattern
+     * @param LoggerInterface             $logger
+     * @param MapInterface                $actionContainer
      */
     public function __construct(array $middlewares,
                                 Node $node,
                                 PathExtractorInterface $extractor,
+                                ParameterExtractorInterface $parameterExtractor,
                                 RouteTreeManager $manager,
                                 string $basePattern,
                                 LoggerInterface $logger,
                                 MapInterface $actionContainer) {
 
-        $this->root            = $node;
-        $this->middlewares     = $middlewares;
-        $this->extractor       = $extractor;
-        $this->manager         = $manager;
-        $this->basePattern     = $this->cleanupPattern($basePattern);
-        $this->actionContainer = $actionContainer;
-        $this->logger          = $logger;
+        $this->root               = $node;
+        $this->middlewares        = $middlewares;
+        $this->extractor          = $extractor;
+        $this->manager            = $manager;
+        $this->basePattern        = $this->cleanupPattern($basePattern);
+        $this->actionContainer    = $actionContainer;
+        $this->logger             = $logger;
+        $this->parameterExtractor = $parameterExtractor;
     }
 
     private function cleanupPattern(string $pattern): string {
@@ -93,7 +98,10 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $node      = $this->getOrCreateNode($pattern);
 
         $node->addReference($method, $reference);
-        $this->actionContainer->set($reference, new Action($method, $handler, $pattern, $middleWares));
+        $this->actionContainer->set(
+            $reference,
+            new Action($method, $handler, $pattern, $middleWares, $this->parameterExtractor)
+        );
         return $this;
     }
 
@@ -122,6 +130,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
             $middleWares ?? [],
             $node,
             $this->extractor,
+            $this->parameterExtractor,
             $this->manager,
             sprintf('%s/%s', $this->basePattern, $pattern),
             $this->logger,

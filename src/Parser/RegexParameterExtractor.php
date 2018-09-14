@@ -6,6 +6,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Parser;
 
+use function array_key_exists;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Router;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
@@ -77,8 +78,12 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * Get parameters from a path using a specified pattern.
      * Resulting map will be mapped as:
      *
+     * Each parameter name have been converted to lower for ease of comparision.
+     *
      * <code>
-     * parameterName => parameterValue
+     * [
+     *   parametername => parametervalue, ...
+     * ]
      * </code>
      *
      * @param string $pattern
@@ -116,13 +121,15 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         // The extra optional slash should be added so that trailing slashes are allowed.
         $regEx = sprintf('%s^%s[\/]?$%s', $this->delimiter, "{$regEx}", $this->delimiter);
         // Test the $path
-        preg_match_all($regEx, $path, $matches, 512 & 1);
-        $map = new SimpleMap();
-
+        preg_match_all($regEx, $path, $matches, 512);
+        array_change_key_case($matches, 0);
         $optionalParameterNames = $this->getParameterNames($pattern, true);
         $requiredParameterNames = $this->getParameterNames($pattern, false);
 
+        $outParameters = new SimpleMap();
+
         foreach ($requiredParameterNames as $name) {
+            $name = mb_strtolower($name);
             if (!array_key_exists($name, $matches) || count($matches[$name]) <= 0 || empty($matches[$name][0])) {
                 throw new InvalidArgumentException(sprintf(
                     'Error when trying to match pattern "%s" with path "%s", Could not match all parameters.',
@@ -130,14 +137,22 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
                     $path
                 ));
             }
-            $map->add($name, $matches[$name][0]);
+            $outParameters->add($name, $matches[$name][0]);
         }
 
         foreach ($optionalParameterNames as $name) {
-            $map->add($name, array_key_exists($name, $matches) ? $matches[$name][0] : null);
+            if (!array_key_exists($name, $matches)) {
+                continue;
+            }
+            $value = $matches[$name][0];
+            if (empty($value)) {
+                $value = null;
+            }
+
+            $outParameters->add(mb_strtolower($name), $value);
         }
 
-        return $map;
+        return $outParameters;
     }
 
 }

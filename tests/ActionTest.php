@@ -10,8 +10,9 @@ namespace Hrafn\Router\Tests;
 use Hrafn\Router\Action;
 use Hrafn\Router\Method;
 use Hrafn\Router\Middleware\AnonymousMiddleware;
-use Hrafn\Router\RequestHandler\CallbackHandler;
-use Hrafn\Router\RequestHandler\ClassHandler;
+use Hrafn\Router\Parser\RegexParameterExtractor;
+use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
+use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use Jitesoft\Container\Container;
 use Jitesoft\Utilities\DataStructures\Arrays;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * ActionTest
@@ -29,7 +31,7 @@ class ActionTest extends TestCase {
 
     public function testGetMethod() {
         Arrays::forEach(Method::getConstantValues(), function($method) {
-            $action = new Action($method, 'Handler@method', '/test', []);
+            $action = new Action($method, 'Handler@method', '/test', [], new RegexParameterExtractor(new NullLogger()));
             $this->assertEquals($method, $action->getMethod());
         });
     }
@@ -41,7 +43,7 @@ class ActionTest extends TestCase {
 
             }),
             new ActionTestTestMiddleware()
-        ]);
+        ], new RegexParameterExtractor(new NullLogger()));
 
         $queue = $action->getMiddlewares();
         $this->assertCount(3, $queue);
@@ -52,9 +54,9 @@ class ActionTest extends TestCase {
 
     public function testGetPattern() {
 
-        $action = new Action('get', 'Handler@method', '/test', []);
+        $action = new Action('get', 'Handler@method', '/test', [], new RegexParameterExtractor(new NullLogger()));
         $this->assertEquals('/test', $action->getPattern());
-        $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', []);
+        $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', [], new RegexParameterExtractor(new NullLogger()));
         $this->assertEquals('/test/{with}/{?params}', $action->getPattern());
     }
 
@@ -62,13 +64,13 @@ class ActionTest extends TestCase {
         $handler = function($r) {
 
         };
-        $action = new Action('get', $handler, '/test', []);
-        $this->assertInstanceOf(CallbackHandler::class, $action->getHandler());
+        $action = new Action('get', $handler, '/test', [], new RegexParameterExtractor(new NullLogger()));
+        $this->assertInstanceOf(ReflectionCallbackHandler::class, $action->getHandler());
     }
 
     public function testGetHandlerClass() {
-        $action = new Action('get', 'Handler@method', '/test', []);
-        $this->assertInstanceOf(ClassHandler::class, $action->getHandler());
+        $action = new Action('get', 'Handler@method', '/test', [], new RegexParameterExtractor(new NullLogger()));
+        $this->assertInstanceOf(ReflectionClassHandler::class, $action->getHandler());
     }
 
 }

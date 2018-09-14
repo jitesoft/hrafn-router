@@ -80,6 +80,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             [],
             $this->rootNode,
             $this->pathExtractor,
+            $this->paramExtractor,
             $this->routeTreeManager,
             '',
             $this->logger,

@@ -8,15 +8,13 @@ namespace Hrafn\Router;
 
 use function explode;
 use Hrafn\Router\Contracts\ActionInterface;
-use Hrafn\Router\RequestHandler\CallbackHandler;
-use Hrafn\Router\RequestHandler\ClassHandler;
+use Hrafn\Router\Contracts\ParameterExtractorInterface;
+use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
+use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Action
@@ -33,25 +31,27 @@ class Action implements ActionInterface {
 
     /**
      * Action constructor.
-     * @param string             $method
-     * @param string|callable    $handler
-     * @param string             $pattern
-     * @param array              $middlewares
+     * @param string                      $method
+     * @param string|callable             $handler
+     * @param string                      $pattern
+     * @param array                       $middlewares
+     * @param ParameterExtractorInterface $parameterExtractor
      * @internal
      */
     public function __construct(string $method,
                                 $handler,
                                 string $pattern,
-                                array $middlewares) {
+                                array $middlewares,
+                                ParameterExtractorInterface $parameterExtractor) {
 
         $this->method  = $method;
         $this->pattern = $pattern;
 
         if (is_callable($handler)) {
-            $this->handler = new CallbackHandler($handler);
+            $this->handler = new ReflectionCallbackHandler($handler, $parameterExtractor, $this);
         } else {
             $handlerSplit  = explode(self::HANDLER_SEPARATOR, $handler);
-            $this->handler = new ClassHandler($handlerSplit[0], $handlerSplit[1]);
+            $this->handler = new ReflectionClassHandler($handlerSplit[0], $handlerSplit[1], $parameterExtractor, $this);
         }
 
         $this->middlewares = new LinkedQueue();
