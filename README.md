@@ -1,30 +1,23 @@
 # Router
 
-Request enters the `handle` method, where at the router matches the request URI to a specific action which will receive the given `ServerRequestInterface`.  
-Parameters will be passed to the function depending on their names, that is:
+*Observe: This project is still a work in progress. Before version 1.0.0 it should be seen as highly unstable.*
 
-```php
-public function handle (int $id, string $name) {...}
 
-// URI => /path/to/method?name=abc&id=5
-// [id] => 5 will be passed as the `id` argument (case insensitive).
-// [name] => abc will be passed as the `name` argument (case insensitive).
-```
+Hrafn-Router is a http router based on a tree structure for requests. Each part of a request target pattern defined through the router 
+is parsed by a `PathExtractor` and then built to a node-tree.  
+Each action is attached to a node by reference and then simply fetched from a hash map structure when needed.
 
-Reg-ex is used to parse the URI of the actions. To set a value as an argument, use the `{name}` syntax and it will be passed
-as any other get parameter.
+The Router supports Parameter injection by using a `ParameterExtractorInterface` implementation which plucks
+parameters from a request target while matching it to the pattern defined in the router.
 
-```php
-public function handle (int $id, string $name) {...}
+ The router currently utilizes the following PSR standards:
+ 
+ * PSR4 Auto-loading
+ * PSR3 Logging
+ * PSR7 Messages
+ * PSR11 Container
+ * PSR15 Handlers
 
-// URI pattern => /path/to/method/{name}
-// URI => /path/to/method/abc?id=5
-// [id] => 5 will be passed as the `id` argument (case insensitive).
-// The last query path part will be passed as [name] => abc, i.e., via the `name` argument.
-```
+---
 
-The first value passed to the method used for handling the request will always be the full Request as a `psr\ServerRequestInterface`.
-
-Any middlewares used have to implement the `psr\MiddlewareInterface`. Middlewares will always be called before the `Action` invokes the controller.
-There order they are called depends on the order they are added when defining the route. Global middlewares added to the router right away will always be
-called before the route middlewares.
+More information, documentation and development guidelines will be supplied before version 1.0.0 of the router.
