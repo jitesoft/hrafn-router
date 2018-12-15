@@ -14,6 +14,7 @@ use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
@@ -36,13 +37,15 @@ class Action implements ActionInterface {
      * @param string                      $pattern
      * @param array                       $middlewares
      * @param ParameterExtractorInterface $parameterExtractor
+     * @param ContainerInterface          $container
      * @internal
      */
     public function __construct(string $method,
                                 $handler,
                                 string $pattern,
                                 array $middlewares,
-                                ParameterExtractorInterface $parameterExtractor) {
+                                ParameterExtractorInterface $parameterExtractor,
+                                ContainerInterface $container) {
 
         $this->method  = $method;
         $this->pattern = $pattern;
@@ -51,7 +54,13 @@ class Action implements ActionInterface {
             $this->handler = new ReflectionCallbackHandler($handler, $parameterExtractor, $this);
         } else {
             $handlerSplit  = explode(self::HANDLER_SEPARATOR, $handler);
-            $this->handler = new ReflectionClassHandler($handlerSplit[0], $handlerSplit[1], $parameterExtractor, $this);
+            $this->handler = new ReflectionClassHandler(
+                $handlerSplit[0],
+                $handlerSplit[1],
+                $parameterExtractor,
+                $this,
+                $container
+            );
         }
 
         $this->middlewares = new LinkedQueue();
