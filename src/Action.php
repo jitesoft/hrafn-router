@@ -12,6 +12,7 @@ use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
+use Jitesoft\Container\Container;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
@@ -30,6 +31,7 @@ class Action implements ActionInterface {
     private $pattern     = null;
     private $middlewares = null;
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * Action constructor.
      * @param string                      $method
@@ -37,7 +39,8 @@ class Action implements ActionInterface {
      * @param string                      $pattern
      * @param array                       $middlewares
      * @param ParameterExtractorInterface $parameterExtractor
-     * @param ContainerInterface          $container
+     * @param ContainerInterface|null     $container
+     *
      * @internal
      */
     public function __construct(string $method,
@@ -45,7 +48,7 @@ class Action implements ActionInterface {
                                 string $pattern,
                                 array $middlewares,
                                 ParameterExtractorInterface $parameterExtractor,
-                                ContainerInterface $container) {
+                                ContainerInterface $container = null) {
 
         $this->method  = $method;
         $this->pattern = $pattern;
@@ -54,12 +57,13 @@ class Action implements ActionInterface {
             $this->handler = new ReflectionCallbackHandler($handler, $parameterExtractor, $this);
         } else {
             $handlerSplit  = explode(self::HANDLER_SEPARATOR, $handler);
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->handler = new ReflectionClassHandler(
                 $handlerSplit[0],
                 $handlerSplit[1],
                 $parameterExtractor,
                 $this,
-                $container
+                $container ?? new Container([])
             );
         }
 
