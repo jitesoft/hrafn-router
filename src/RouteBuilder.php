@@ -118,7 +118,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $pattern = $this->cleanupPattern($pattern);
 
         $pathParts = $this->extractor->getUriParts($pattern);
-        $node      = $this->manager->createOrGetRootNode($pathParts->dequeue());
+        $node      = $this->root;
         $part      = $pathParts->dequeue();
 
         while ($part !== null) {

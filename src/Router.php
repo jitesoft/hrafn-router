@@ -75,7 +75,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
         $this->routeTreeManager = new RouteTreeManager($this->logger);
         $this->actions          = new SimpleMap();
-        $this->rootNode         = new Node(null, '/');
+        $this->rootNode         = new Node(null, '');
         $this->routeBuilder     = new RouteBuilder(
             [],
             $this->rootNode,

@@ -52,20 +52,19 @@ class RouteBuilderTest extends TestCase {
     }
 
     public function testGroup() {
-        $this->routeBuilder->group('/test', function(RouteBuilder $builder) {
-           $builder->get('/abc', function() {});
+        $this->routeBuilder->group('test', function(RouteBuilder $builder) {
+           $builder->get('abc', function() {});
         }, []);
 
         $container = $this->getPrivateValue($this->routeBuilder, 'actionContainer');
-        $manager   = $this->getPrivateValue($this->routeBuilder, 'manager');
+        /** @var Node $root */
+        $root = $this->getPrivateValue($this->routeBuilder, 'root');
 
-        $this->assertArrayHasKey('get::test/abc', $container);
-        $node = $manager->createOrGetNode(
-            $manager->createOrGetRootNode('test'), 'abc'
-        );
-        $this->assertCount(1, $this->getPrivateValue($node, 'references'));
-        $this->assertTrue($this->getPrivateValue($node, 'references')->has('get'));
-        $this->assertEquals('get::test/abc', $this->getPrivateValue($node, 'references')->get('get'));
+        $this->assertTrue($root->hasChild('test'));
+        $child = $root->getChild('test');
+        $this->assertTrue($child->hasChild('abc'));
+        $this->assertEquals('get::test/abc', $child->getChild('abc')->getReference('get'));
+        $this->assertTrue($container->has('get::test/abc'));
     }
 
     public function testNamespace() {
@@ -74,15 +73,14 @@ class RouteBuilderTest extends TestCase {
         }, []);
 
         $container = $this->getPrivateValue($this->routeBuilder, 'actionContainer');
-        $manager   = $this->getPrivateValue($this->routeBuilder, 'manager');
+        /** @var Node $root */
+        $root = $this->getPrivateValue($this->routeBuilder, 'root');
 
-        $this->assertArrayHasKey('get::test/abc', $container);
-        $node = $manager->createOrGetNode(
-            $manager->createOrGetRootNode('test'), 'abc'
-        );
-        $this->assertCount(1, $this->getPrivateValue($node, 'references'));
-        $this->assertTrue($this->getPrivateValue($node, 'references')->has('get'));
-        $this->assertEquals('get::test/abc', $this->getPrivateValue($node, 'references')->get('get'));
+        $this->assertTrue($root->hasChild('test'));
+        $child = $root->getChild('test');
+        $this->assertTrue($child->hasChild('abc'));
+        $this->assertEquals('get::test/abc', $child->getChild('abc')->getReference('get'));
+        $this->assertTrue($container->has('get::test/abc'));
     }
 
     public function testActions() {
