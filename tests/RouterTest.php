@@ -7,6 +7,8 @@
 
 namespace Hrafn\Router\Tests;
 
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\ServerRequest;
 use Hrafn\Router\Router;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +19,19 @@ use PHPUnit\Framework\TestCase;
  */
 class RouterTest extends TestCase {
 
-    public function testHi() {
-        $r = new Router();
+    public function testHandle() {
+        $router = new Router();
+
+        $wasCalled = falsE;
+        $router->getBuilder()->get('/test', function() use(&$wasCalled) {
+            $wasCalled = true;
+            return new Response(200);
+
+        });
+
+        $result = $router->handle(new ServerRequest('get', '/test'));
+        $this->assertTrue($wasCalled);
+        $this->assertEquals(200, $result->getStatusCode());
     }
+
 }

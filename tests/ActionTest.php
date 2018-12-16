@@ -13,7 +13,6 @@ use Hrafn\Router\Middleware\AnonymousMiddleware;
 use Hrafn\Router\Parser\RegexParameterExtractor;
 use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RequestHandler\ReflectionClassHandler;
-use Jitesoft\Container\Container;
 use Jitesoft\Utilities\DataStructures\Arrays;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
