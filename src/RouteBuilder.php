@@ -73,9 +73,9 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $parts = $this->extractor->getUriParts($pattern);
         $node  = $this->manager->createOrGetNode($this->root, $parts->dequeue());
 
-        do {
+        while ($parts->count() > 0) {
             $node = $this->manager->createOrGetNode($node, $parts->dequeue());
-        } while ($node !== null);
+        }
 
         return $node;
     }
@@ -114,7 +114,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * @param callable   $closure
      * @return RouteBuilderInterface
      */
-    public function namespace(string $pattern, callable $closure, ?array $middleWares): RouteBuilderInterface {
+    public function namespace(string $pattern, callable $closure, ?array $middleWares = []): RouteBuilderInterface {
         $pattern = $this->cleanupPattern($pattern);
 
         $pathParts = $this->extractor->getUriParts($pattern);
@@ -151,7 +151,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * @param array|null $middleWares
      * @return RouteBuilderInterface
      */
-    public function group(string $pattern, callable $closure, ?array $middleWares): RouteBuilderInterface {
+    public function group(string $pattern, callable $closure, ?array $middleWares = []): RouteBuilderInterface {
         return $this->namespace($pattern, $closure, $middleWares);
     }
 
