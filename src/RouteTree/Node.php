@@ -31,10 +31,6 @@ class Node {
     /** @var string|null */
     private $references;
 
-    public function dump() {
-        var_dump($this->children);
-    }
-
     /**
      * RouteNode constructor.
      * @param Node|null   $parent

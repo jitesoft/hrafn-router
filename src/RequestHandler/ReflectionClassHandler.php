@@ -61,8 +61,12 @@ class ReflectionClassHandler implements RequestHandlerInterface {
 
     /**
      * Handle the request and return a response.
+     *
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws HttpBadRequestException
+     * @throws HttpInternalServerErrorException
+     * @throws ReflectionException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $class = null;
@@ -113,6 +117,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
                     }
                 } catch (ReflectionException $ex) {
                     // Do nothing.
+                    continue;
                 }
                 // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
                 // not exist.

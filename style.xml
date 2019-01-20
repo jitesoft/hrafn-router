@@ -28,7 +28,7 @@
     <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
     <rule ref="Generic.Metrics.CyclomaticComplexity">
         <properties>
-            <property name="complexity" value="8"/>
+            <property name="complexity" value="9"/>
             <property name="absoluteComplexity" value="12"/>
         </properties>
     </rule>

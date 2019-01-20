@@ -21,7 +21,8 @@
     "authors": [
         {
             "name": "Johannes Tegnér",
-            "email": "johannes@jitesoft.com"
+            "email": "johannes@jitesoft.com",
+            "homepage": "https://jite.eu"
         }
     ],
     "suggest": {

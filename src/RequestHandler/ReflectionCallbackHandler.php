@@ -78,6 +78,7 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
                     }
                 } catch (ReflectionException $ex) {
                     // Do nothing.
+                    continue;
                 }
                 // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
                 // not exist.

@@ -56,7 +56,7 @@ class Action implements ActionInterface {
         if (is_callable($handler)) {
             $this->handler = new ReflectionCallbackHandler($handler, $parameterExtractor, $this);
         } else {
-            $handlerSplit  = explode(self::HANDLER_SEPARATOR, $handler);
+            $handlerSplit = explode(self::HANDLER_SEPARATOR, $handler);
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->handler = new ReflectionClassHandler(
                 $handlerSplit[0],

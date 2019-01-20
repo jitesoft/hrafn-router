@@ -115,7 +115,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         $regEx = preg_replace($replace, $with, $pattern);
         // We need to make sure that optional placeholders have an optional slash, to make sure that
         // `/path/optional`, /path/optional/ `/path/` and `/path` will match the regex.
-        // TODO: Future optimization could use a lookahead to replace it in one pass.
+        // Future optimization could use a lookahead to replace it in one pass.
         $regEx = preg_replace('~\\\/\(\?\:~', '[\/]?(?:', $regEx);
         // Put together the full regular expression string before testing.
         // The extra optional slash should be added so that trailing slashes are allowed.

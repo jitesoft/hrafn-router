@@ -2,15 +2,17 @@
 
 *Observe: This project is still a work in progress. Before version 1.0.0 it should be seen as highly unstable.*
 
+## What is this?
 
-Hrafn-Router is a http router based on a tree structure for requests. Each part of a request target pattern defined through the router 
-is parsed by a `PathExtractor` and then built to a node-tree.  
-Each action is attached to a node by reference and then simply fetched from a hash map structure when needed.
+Hrafn router is a router implementation using a tree structure to map up routes.  
+The main reason of building it is/was to test if it was possible to build a router which could
+process and route paths faster using a tree than not.
 
-The Router supports Parameter injection by using a `ParameterExtractorInterface` implementation which plucks
-parameters from a request target while matching it to the pattern defined in the router.
+The project is in early stages and the current version is unstable. That is: *it's not recommended to use this router in production yet*.
 
- The router currently utilizes the following PSR standards:
+## PSR and Interface binding
+
+This project makes use and implements the following PSR standards:
  
  * PSR4 Auto-loading
  * PSR3 Logging
@@ -18,6 +20,67 @@ parameters from a request target while matching it to the pattern defined in the
  * PSR11 Container
  * PSR15 Handlers
 
----
+Most interfaces are swap-able by using a container implementation of choice. If no container is defined
+a container using the `jitesoft/container` and the implementations in the project are used.
 
-More information, documentation and development guidelines will be supplied before version 1.0.0 of the router.
+Feel free to read the API documentation for more information about what Interfaces you can use to customize the project to your own liking.
+
+## Usage
+
+The router expects each path to map to a given action. The action can be a standard callable or a method
+in a class. You can group/namespace paths and placeholders for variables are available.
+
+### Simple use-case
+
+Example using a standard get route:
+
+```php
+<?php
+use Hrafn\Router;
+
+$router = new Router(/*pass your PSR-11 container here if wanted.*/);
+$builder = $router->getBuilder();
+
+$builder->get('test', function(ServerRequest $request) {
+    // Do something.
+    return new Response(); // PSR-7 response.
+});
+
+// Handle the request:
+$router->handle(ServerRequest::fromGlobals()); // PSR-7 Request.
+```
+
+### Parameters
+
+To bind parameters to a request path, the following standard is used:
+
+```
+{parameter} // Required parameter.
+{?parameter} // Optional parameter.
+```
+
+Example:
+
+```php
+<?php
+$builder->get('test/{name}', function($name) {
+    
+});
+```
+
+When `/test/abc` is called, the `$name` parameter will be set to `abc`.
+
+### Using class handlers
+
+Instead of using a function as the callback, a method from a class can be used.
+When this is done, the router will try to create the class firstly by using the container, then depending
+on the parameters in the class constructor, it will try to inject it with bound or default parameters.
+
+When the class is created, the method will be called with the parameters that the route defines. If the first parameter is 
+a implementation of the `RequestInterface` the request will be passed first.
+
+### Middlewares
+
+It's possible to use middlewares right out of the box, the middlewares must either implement the `Psr\Http\Server\MiddlewareInterface`
+or be a callback function. They will be applied in the order they are passed. If using namespaces/groups, their middlewares will be applied first.
+So it's easy to add a group which is restricted by using a middleware.
