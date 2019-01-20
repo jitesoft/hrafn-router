@@ -2,7 +2,7 @@ stages:
   - test
 
 test:
-  image: jitesoft/php-unit
+  image: jitesoft/phpunit
   script:
     - composer install --no-interaction --prefer-dist
     - vendor/bin/phpcs -p --report=summary --standard=style.xml src
