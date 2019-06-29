@@ -24,6 +24,10 @@ class RouteTreeManager implements LoggerAwareInterface {
     /** @var LoggerInterface */
     private $logger;
 
+    /**
+     * RouteTreeManager constructor.
+     * @param LoggerInterface $logger Logger to use.
+     */
     public function __construct(LoggerInterface $logger) {
         $this->logger    = $logger;
         $this->rootNodes = new SimpleMap();
@@ -32,21 +36,28 @@ class RouteTreeManager implements LoggerAwareInterface {
     /**
      * Create a new or return existing root node.
      *
-     * @param string $part
+     * @param string $part Node path part.
      * @return Node
      */
     public function createOrGetRootNode(string $part): Node {
-        $this->logger->debug('{tag} Fetching or creating root node.', ['tag' => Router::LOG_TAG]);
+        $this->logger->debug(
+            '{tag} Fetching or creating root node.',
+            ['tag' => Router::LOG_TAG]
+        );
         if ($this->rootNodes->has($part)) {
-            $this->logger->debug('{tag} Node existed, returning route node with part {part}.', [
-                'tag'  => Router::LOG_TAG,
-                'part' => $part
-            ]);
+            $this->logger->debug(
+                '{tag} Node existed, returning route node with part {part}.', [
+                    'tag'  => Router::LOG_TAG,
+                    'part' => $part
+                ]
+            );
         } else {
-            $this->logger->debug('{tag} Route node did not exist, creating new node with part {part}.', [
-                'tag'  => Router::LOG_TAG,
-                'part' => $part
-            ]);
+            $this->logger->debug(
+                '{tag} Node did not exist, creating node with part {part}.', [
+                    'tag'  => Router::LOG_TAG,
+                    'part' => $part
+                ]
+            );
 
             $this->rootNodes[$part] = new Node(null, $part);
         }
@@ -57,32 +68,35 @@ class RouteTreeManager implements LoggerAwareInterface {
     /**
      * Create or get an existing node from a given node.
      *
-     * @param Node   $parent
-     * @param string $part
+     * @param Node   $parent Parent node.
+     * @param string $part   Path part.
      * @return Node
      */
     public function createOrGetNode(Node $parent, string $part): Node {
         if ($parent->hasChild($part)) {
-            $this->logger->debug('{tag} Node had child with part {part} returning node.', [
-                'tag'  => Router::LOG_TAG,
-                'part' => $part
-            ]);
+            $this->logger->debug(
+                '{tag} Node had child with part {part} returning node.', [
+                    'tag'  => Router::LOG_TAG,
+                    'part' => $part
+                ]
+            );
         } else {
 
-            $this->logger->debug('{tag} No child with part {part} existed. Creating new node..', [
-                'tag'  => Router::LOG_TAG,
-                'part' => $part
-            ]);
+            $this->logger->debug(
+                '{tag} No child with part {part} existed. Creating new node.', [
+                    'tag'  => Router::LOG_TAG,
+                    'part' => $part
+                ]
+            );
             $parent->createChild($part);
         }
         return $parent->getChild($part);
-
     }
 
     /**
      * Sets a logger instance on the object.
      *
-     * @param LoggerInterface $logger
+     * @param LoggerInterface $logger Logger to use.
      *
      * @return void
      * @codeCoverageIgnore
@@ -90,4 +104,5 @@ class RouteTreeManager implements LoggerAwareInterface {
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;
     }
+
 }

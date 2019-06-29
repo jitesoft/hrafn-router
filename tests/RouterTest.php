@@ -14,7 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * RouterTest
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class RouterTest extends TestCase {

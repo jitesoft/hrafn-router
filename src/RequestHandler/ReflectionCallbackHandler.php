@@ -23,12 +23,22 @@ use ReflectionFunction;
  * @version 1.0.0
  */
 class ReflectionCallbackHandler implements RequestHandlerInterface {
-
+    /** @var callable */
     private $callback;
+    /** @var ParameterExtractorInterface */
     private $parameterExtractor;
+    /** @var Action */
     private $action;
 
-    public function __construct(callable $callback, ParameterExtractorInterface $parameterExtractor, Action $action) {
+    /**
+     * ReflectionCallbackHandler constructor.
+     * @param callable                    $callback           Callback to handle.
+     * @param ParameterExtractorInterface $parameterExtractor Extractor for the path parameters.
+     * @param Action                      $action             Action object.
+     */
+    public function __construct(callable $callback,
+                                ParameterExtractorInterface $parameterExtractor,
+                                Action $action) {
         $this->callback           = $callback;
         $this->parameterExtractor = $parameterExtractor;
         $this->action             = $action;
@@ -36,10 +46,11 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
 
     /**
      * Handle the request and return a response.
-     * @param ServerRequestInterface $request
+     *
+     * @param ServerRequestInterface $request Request to handle.
      * @return ResponseInterface
-     * @throws ReflectionException
-     * @throws HttpBadRequestException
+     * @throws ReflectionException     On reflection error.
+     * @throws HttpBadRequestException On bad request.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $reflect    = new ReflectionFunction($this->callback);
@@ -72,7 +83,9 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
                 $class = null;
                 try {
                     $class = $parameter->getClass();
-                    if ($class && $class->implementsInterface(RequestInterface::class)) {
+                    if ($class
+                        && $class->implementsInterface(RequestInterface::class)
+                    ) {
                         $arguments[] = $request;
                         continue;
                     }
@@ -82,14 +95,14 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
                 }
                 // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
                 // not exist.
-                throw new HttpBadRequestException(sprintf(
+                throw new HttpBadRequestException(
+                    sprintf(
                         'Parameter in handler does not exist in pattern (%s).',
                         $parameter->getName()
                     )
                 );
             }
         }
-
 
         return $reflect->invokeArgs($arguments);
     }

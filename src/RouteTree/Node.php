@@ -7,6 +7,7 @@
 
 namespace Hrafn\Router\RouteTree;
 
+use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
 
@@ -33,8 +34,8 @@ class Node {
 
     /**
      * RouteNode constructor.
-     * @param Node|null   $parent
-     * @param string      $part
+     * @param Node|null $parent Parent node.
+     * @param string    $part   Part of path this node uses.
      * @internal
      */
     public function __construct(?Node $parent, string $part) {
@@ -45,7 +46,7 @@ class Node {
     }
 
     /**
-     * @param string $part
+     * @param string $part Part of path that the child node should use.
      * @return Node
      */
     public function createChild(string $part): Node {
@@ -54,8 +55,8 @@ class Node {
     }
 
     /**
-     * @param string $part
-     * @return bool
+     * @param string $part Part of path to check for.
+     * @return boolean
      */
     public function hasChild(string $part) {
         return $this->children->has($part);
@@ -64,20 +65,28 @@ class Node {
     /**
      * Get an action reference based on method.
      *
-     * @param string $method
+     * @param string $method Method to fetch.
      * @return null|string
      */
     public function getReference(string $method): ?string {
-        return $this->references->has($method) ? $this->references[$method] : null;
+        if ($this->references->has($method)) {
+            try {
+                return $this->references->get($method);
+            } catch (InvalidArgumentException $e) {
+                die('This should never happen.');
+            }
+        }
+        return null;
     }
 
     /**
      * Add an action reference.
      *
-     * @param string $method    - HTTP Method.
-     * @param string $reference - Reference as string to the action.
+     * @param string $method    HTTP Method.
+     * @param string $reference Reference as string to the action.
+     * @return void
      */
-    public function addReference(string $method, string $reference) {
+    public function addReference(string $method, string $reference): void {
         $this->references[$method] = $reference;
     }
 
@@ -85,7 +94,7 @@ class Node {
      * Get child with given path.
      * If child does not exist, null will be returned.
      *
-     * @param string $part
+     * @param string $part Part of the path to fetch child for.
      * @return Node|null
      */
     public function getChild(string $part): ?Node {

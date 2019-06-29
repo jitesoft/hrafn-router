@@ -34,7 +34,7 @@ class RegexPathExtractor implements PathExtractorInterface {
 
     /**
      * RegexPathExtractor constructor.
-     * @param LoggerInterface $logger
+     * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
         $this->logger          = $logger;
@@ -46,7 +46,7 @@ class RegexPathExtractor implements PathExtractorInterface {
     /**
      * Sets a logger instance on the object.
      *
-     * @param LoggerInterface $logger
+     * @param LoggerInterface $logger Logger to use.
      * @return void
      * @codeCoverageIgnore
      */
@@ -58,30 +58,44 @@ class RegexPathExtractor implements PathExtractorInterface {
      * Get parts of a path.
      * When a part is a defined parameter, it will be a string value named '%PARAM%'.
      *
-     * @param string $path
+     * @param string $path Path to extract uri parts from.
      * @return QueueInterface
      */
     public function getUriParts(string $path): QueueInterface {
-        $this->logger->debug('{tag} Extracting URI Paths from the supplied route path.', [
-            'tag' => Router::LOG_TAG
-        ]);
+        $this->logger->debug(
+            '{tag} Extracting URI Paths from the supplied route path.', [
+                'tag' => Router::LOG_TAG
+            ]
+        );
         $format  = '%s%s%s';
         $replace = [
-            sprintf($format, $this->delimiter, $this->requiredPattern, $this->delimiter),
-            sprintf($format, $this->delimiter, $this->optionalPattern, $this->delimiter)
+            sprintf(
+                $format,
+                $this->delimiter,
+                $this->requiredPattern,
+                $this->delimiter
+            ),
+            sprintf(
+                $format,
+                $this->delimiter,
+                $this->optionalPattern,
+                $this->delimiter
+            )
         ];
 
         $path = preg_replace($replace, '%PARAM%', $path);
         $list = explode('/', $path);
-        $this->logger->debug('{tag} Extracted {count} parts from the path.', [
-            'tag' => Router::LOG_TAG,
-            'count' => count($list)
-        ]);
+        $this->logger->debug(
+            '{tag} Extracted {count} parts from the path.', [
+                'tag' => Router::LOG_TAG,
+                'count' => count($list)
+            ]
+        );
 
         if ($list[0] === '') {
             $list = array_slice($list, 1);
         }
-        if ($list[count($list)-1] === '') {
+        if ($list[count($list) - 1] === '') {
             array_pop($list);
         }
 

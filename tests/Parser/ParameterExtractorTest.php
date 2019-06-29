@@ -117,7 +117,7 @@ class ParameterExtractorTest extends TestCase {
         $pattern = '/path/with/{parameter}/{required}';
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Error when trying to match pattern "/path/with/{parameter}/{required}" with path "/path/with/abc123", Could not match all parameters.'
+            'Error matching pattern "/path/with/{parameter}/{required}" with path "/path/with/abc123".'
         );
         $this->extractor->getUriParameters($pattern, $path);
     }

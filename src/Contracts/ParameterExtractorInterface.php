@@ -26,10 +26,11 @@ interface ParameterExtractorInterface extends LoggerAwareInterface {
      * parameterName => parameterValue
      * </code>
      *
-     * @param string $pattern
-     * @param string $path
+     * @param string $pattern Pattern to extract params with.
+     * @param string $path    Path to extract params from.
      * @return MapInterface
      */
-    public function getUriParameters(string $pattern, string $path): MapInterface;
+    public function getUriParameters(string $pattern,
+                                     string $path): MapInterface;
 
 }

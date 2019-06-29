@@ -7,7 +7,7 @@
 
 namespace Hrafn\Router;
 
-use Hrafn\Router\{Contracts\ActionInterface,
+use Hrafn\Router\ {
     Contracts\DispatcherInterface,
     Contracts\ParameterExtractorInterface,
     Contracts\RouteBuilderInterface,
@@ -16,7 +16,8 @@ use Hrafn\Router\{Contracts\ActionInterface,
     Parser\RegexParameterExtractor as ParamExtractor,
     Parser\RegexPathExtractor as PathExtractor,
     RouteTree\Node,
-    RouteTree\RouteTreeManager};
+    RouteTree\RouteTreeManager
+};
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
@@ -24,21 +25,22 @@ use Jitesoft\Utilities\DataStructures\Maps\ {
     MapInterface,
     SimpleMap
 };
-use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\ {
     Container\ContainerInterface,
-    Http\Message\ResponseInterface,
-    Http\Message\ServerRequestInterface,
-    Http\Server\RequestHandlerInterface,
     Log\LoggerAwareInterface,
     Log\LoggerInterface,
     Log\NullLogger
 };
-
+use Psr\Http\ {
+    Message\ResponseInterface,
+    Message\ServerRequestInterface,
+    Server\RequestHandlerInterface,
+};
 
 /**
  * Router
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class Router implements LoggerAwareInterface, RequestHandlerInterface {
@@ -57,21 +59,39 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     private $routeTreeManager;
     /** @var PathExtractorInterface */
     private $pathExtractor;
-    /** @var ParameterExtractorInterface */
+    /**@var ParameterExtractorInterface*/
     private $paramExtractor;
     /** @var Node */
     private $rootNode;
 
+    /**
+     * Router constructor.
+     * @param ContainerInterface|null $container Dependency container.
+     */
     public function __construct(?ContainerInterface $container = null) {
         $this->container = $container ?? new SimpleMap();
 
-        $getOrNull = function($name) use($container) {
-            return $this->container->has($name) ? $this->container->get($name) : null;
+        $get = function($name, $default) {
+            if (!$this->container->has($name)) {
+                $this->container->set($name, $default);
+            }
+            return $this->container->get($name);
         };
 
-        $this->logger         = $getOrNull(LoggerInterface::class) ?? new NullLogger();
-        $this->pathExtractor  = $getOrNull(PathExtractorInterface::class) ?? new PathExtractor($this->logger);
-        $this->paramExtractor = $getOrNull(ParameterExtractorInterface::class) ?? new ParamExtractor($this->logger);
+        $this->logger = $get(
+            LoggerInterface::class,
+            new NullLogger()
+        );
+
+        $this->pathExtractor = $get(
+            PathExtractorInterface::class,
+            new PathExtractor($this->logger)
+        );
+
+        $this->paramExtractor = $get(
+            ParameterExtractorInterface::class,
+            new ParamExtractor($this->logger)
+        );
 
         $this->routeTreeManager = new RouteTreeManager($this->logger);
         $this->actions          = new SimpleMap();
@@ -91,11 +111,11 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * Sets a logger instance on the object.
      *
-     * @param LoggerInterface $logger
+     * @param LoggerInterface $logger Logger to use.
      * @return void
      * @codeCoverageIgnore
      */
-    public function setLogger(LoggerInterface $logger) {
+    public function setLogger(LoggerInterface $logger): void {
         $this->logger = $logger;
         $this->routeBuilder->setLogger($logger);
         $this->routeTreeManager->setLogger($logger);
@@ -105,18 +125,18 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * @return RouteBuilderInterface
      */
-    public function getBuilder() {
+    public function getBuilder () {
         return $this->routeBuilder;
     }
 
     /**
      * Handle the request and return a response.
      *
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface $request Request to handle.
      * @return ResponseInterface
-     * @throws HttpMethodNotAllowedException
-     * @throws HttpNotFoundException
-     * @throws InvalidArgumentException
+     * @throws HttpMethodNotAllowedException On invalid http method.
+     * @throws HttpNotFoundException         On invalid path.
+     * @throws InvalidArgumentException      On invalid argument.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $dispatcher = null;
@@ -131,10 +151,20 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             );
         }
 
+        for ($i = 0; $i === 0; $i++) {
+            return $dispatcher
+                ->dispatch(
+                    $request->getMethod(),
+                    $request->getRequestTarget()
+                )
+                ->handle($request);
+        }
+
         return $dispatcher
             ->dispatch(
                 $request->getMethod(),
-                $request->getRequestTarget())
+                $request->getRequestTarget()
+            )
             ->handle($request);
     }
 

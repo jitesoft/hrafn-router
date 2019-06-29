@@ -27,54 +27,63 @@ use Psr\Log\NullLogger;
  * @version 1.0.0
  */
 class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
-
+    /** @var PathExtractorInterface|RegexPathExtractor|null */
     private $pathExtractor = null;
-    private $logger        = null;
-    private $root          = null;
-    private $actions       = null;
+    /** @var LoggerInterface|NullLogger|null */
+    private $logger = null;
+    /** @var Node|null */
+    private $root = null;
+    /** @var MapInterface|null */
+    private $actions = null;
 
     /**
      * DefaultDispatcher constructor.
-     * @param Node                        $rootNode
-     * @param MapInterface                $actions
-     * @param PathExtractorInterface|null $pathExtractor
-     * @param null|LoggerInterface        $logger
+     * @param Node                        $rootNode      Initial node to traverse from.
+     * @param MapInterface                $actions       Actions map.
+     * @param PathExtractorInterface|null $pathExtractor Extractor for paths.
+     * @param null|LoggerInterface        $logger        Logger to use.
      */
     public function __construct(Node $rootNode,
                                 MapInterface $actions,
                                 ?PathExtractorInterface $pathExtractor = null,
                                 ?LoggerInterface $logger = null) {
-
         $this->logger        = $logger ?? new NullLogger();
-        $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor($this->logger);
         $this->root          = $rootNode;
         $this->actions       = $actions;
+        $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor(
+            $this->logger
+        );
     }
 
-
     /**
-     * @param Node           $parent
-     * @param QueueInterface $parts
+     * @param Node           $parent Parent node.
+     * @param QueueInterface $parts  Queue to traverse.
      * @return Node
-     * @throws HttpNotFoundException
+     * @throws HttpNotFoundException On path not found.
      */
     private function getNode(Node $parent, QueueInterface $parts): Node {
         if ($parts->count() === 0 || !$parent->hasChild($parts->peek())) {
-            throw new HttpNotFoundException('Could not locate the requested resource.');
+            throw new HttpNotFoundException(
+                'Could not locate the requested resource.'
+            );
         }
 
         $node = $parent->getChild($parts->dequeue());
-        return ($parts->peek() === null) ? $node : $this->getNode($node, $parts);
+        return ($parts->peek() === null) ? $node : $this->getNode(
+            $node,
+            $parts
+        );
     }
 
     /**
-     * @param string $method
-     * @param string $target
+     * @param string $method Method that is used in request.
+     * @param string $target Target path.
      * @return RequestHandlerInterface
-     * @throws HttpNotFoundException
-     * @throws HttpMethodNotAllowedException
+     * @throws HttpNotFoundException         On path not found.
+     * @throws HttpMethodNotAllowedException On method not existing.
      */
-    public function dispatch(string $method, string $target): RequestHandlerInterface {
+    public function dispatch(string $method,
+                             string $target): RequestHandlerInterface {
         $parts     = $this->pathExtractor->getUriParts($target);
         $node      = $this->getNode($this->root, $parts);
         $reference = $node->getReference(mb_strtolower($method));
@@ -87,19 +96,18 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
             throw new HttpNotFoundException();
         }
 
-        /** @var ActionInterface $action */
         return $this->actions[$reference]->getHandler();
     }
 
     /**
      * Sets a logger instance on the object.
      *
-     * @param LoggerInterface $logger
-     *
+     * @param LoggerInterface $logger Logger to use.
      * @return void
      * @codeCoverageIgnore
      */
     public function setLogger(LoggerInterface $logger) {
         $this->logger = $logger;
     }
+
 }

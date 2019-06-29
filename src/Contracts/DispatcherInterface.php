@@ -20,12 +20,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 interface DispatcherInterface {
 
     /**
-     * @param string $method
-     * @param string $target
+     * @param string $method Method to dispatch.
+     * @param string $target Target path.
      * @return RequestHandlerInterface
-     * @throws HttpNotFoundException
-     * @throws HttpMethodNotAllowedException
+     * @throws HttpNotFoundException         On path not found.
+     * @throws HttpMethodNotAllowedException On method not found.
      */
-    public function dispatch(string $method, string $target): RequestHandlerInterface;
+    public function dispatch(string $method,
+                             string $target): RequestHandlerInterface;
 
 }

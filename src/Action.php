@@ -13,6 +13,7 @@ use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
 use Jitesoft\Container\Container;
+use Jitesoft\Exceptions\Psr\Container\ContainerException;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
@@ -26,20 +27,23 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Action implements ActionInterface {
     private const HANDLER_SEPARATOR = '@';
 
-    private $method      = null;
-    private $handler     = null;
-    private $pattern     = null;
+    /** @var string|null */
+    private $method = null;
+    /** @var ReflectionClassHandler|null */
+    private $handler = null;
+    /** @var string|null */
+    private $pattern = null;
+    /** @var LinkedQueue|null */
     private $middlewares = null;
 
-    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * Action constructor.
-     * @param string                      $method
-     * @param string|callable             $handler
-     * @param string                      $pattern
-     * @param array                       $middlewares
-     * @param ParameterExtractorInterface $parameterExtractor
-     * @param ContainerInterface|null     $container
+     * @param string                      $method             Method of the given action.
+     * @param string|callable             $handler            Action callback handler.
+     * @param string                      $pattern            Pattern the action uses.
+     * @param array                       $middlewares        Middlewares to use.
+     * @param ParameterExtractorInterface $parameterExtractor Parameter extractor object.
+     * @param ContainerInterface|null     $container          Dependency container.
      *
      * @internal
      */
@@ -49,22 +53,28 @@ class Action implements ActionInterface {
                                 array $middlewares,
                                 ParameterExtractorInterface $parameterExtractor,
                                 ContainerInterface $container = null) {
-
         $this->method  = $method;
         $this->pattern = $pattern;
 
         if (is_callable($handler)) {
-            $this->handler = new ReflectionCallbackHandler($handler, $parameterExtractor, $this);
+            $this->handler = new ReflectionCallbackHandler(
+                $handler,
+                $parameterExtractor,
+                $this
+            );
         } else {
             $handlerSplit = explode(self::HANDLER_SEPARATOR, $handler);
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->handler = new ReflectionClassHandler(
-                $handlerSplit[0],
-                $handlerSplit[1],
-                $parameterExtractor,
-                $this,
-                $container ?? new Container([])
-            );
+            try {
+                $this->handler = new ReflectionClassHandler(
+                    $handlerSplit[0],
+                    $handlerSplit[1],
+                    $parameterExtractor,
+                    $this,
+                    $container ?? new Container([])
+                );
+            } catch (ContainerException $e) {
+                die('This should never happen as the container is empty...');
+            }
         }
 
         $this->middlewares = new LinkedQueue();

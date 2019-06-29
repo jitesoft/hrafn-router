@@ -22,6 +22,11 @@ class AnonymousMiddleware implements MiddlewareInterface {
     /** @var callable */
     private $handler;
 
+    /**
+     * AnonymousMiddleware constructor.
+     *
+     * @param callable $handler Handler to invoke.
+     */
     public function __construct(callable $handler) {
         $this->handler = $handler;
     }
@@ -29,11 +34,14 @@ class AnonymousMiddleware implements MiddlewareInterface {
     /**
      * Process an incoming server request and return a response, optionally delegating
      * response creation to a handler.
-     * @param ServerRequestInterface  $request
-     * @param RequestHandlerInterface $handler
+     *
+     * @param ServerRequestInterface  $request Request to handle.
+     * @param RequestHandlerInterface $handler Handler to pass to the callback.
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
+    public function process(ServerRequestInterface $request,
+                            RequestHandlerInterface $handler
+    ): ResponseInterface {
         $method = $this->handler;
         return $method($request, $handler);
     }
