@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2613e663477703fe8a7fa1c214aa29c9",
+    "content-hash": "1437ed9c9f03237cec5cde3659c6089b",
     "packages": [
         {
             "name": "jitesoft/datastructures",
