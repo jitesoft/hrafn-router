@@ -35,8 +35,8 @@
         "php": ">=7.2",
         "jitesoft/datastructures": "^3.0",
         "psr/http-message": "1.0.*",
-        "psr/log": "1.0.*",
-        "jitesoft/exceptions": "2.*",
+        "psr/log": "^1.1.0",
+        "jitesoft/exceptions": "2.3.*",
         "psr/http-server-handler": "1.0.*",
         "psr/http-server-middleware": "1.0.*",
         "psr/container": "1.0.*"
