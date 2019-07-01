@@ -12,6 +12,7 @@ use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionException;
 use ReflectionFunction;
@@ -53,11 +54,22 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
      * @throws HttpBadRequestException On bad request.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
+        if ($this->action->getMiddlewares()->count() !== 0) {
+            return $this->action
+                ->getMiddlewares()
+                ->dequeue()
+                ->process(
+                    $request,
+                    $this
+                );
+        }
+
         $reflect    = new ReflectionFunction($this->callback);
         $parameters = $reflect->getParameters();
 
+        $arguments = [];
         if (count($parameters) === 0) {
-            $reflect->invoke($request);
+            $arguments[] = $request;
         }
 
         $parsedParams = $this->parameterExtractor->getUriParameters(
@@ -65,7 +77,6 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
             $request->getRequestTarget()
         );
 
-        $arguments = [];
         // The controller does not HAVE to have the required parameters, they are just required
         // in the uri, not the controller.
         // So check if it exists in the list of parameters, and if so, add it.

@@ -9,11 +9,13 @@ namespace Hrafn\Router;
 use function explode;
 use Hrafn\Router\Contracts\ActionInterface;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
+use Hrafn\Router\Middleware\AnonymousMiddleware;
 use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
 use Jitesoft\Container\Container;
 use Jitesoft\Exceptions\Psr\Container\ContainerException;
+use Jitesoft\Utilities\DataStructures\Arrays;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
@@ -76,6 +78,16 @@ class Action implements ActionInterface {
                 die('This should never happen as the container is empty...');
             }
         }
+
+        $middlewares = Arrays::map(
+            $middlewares,
+            function ($middleware) {
+                if (is_callable($middleware)) {
+                    return new AnonymousMiddleware($middleware);
+                }
+                return $middleware;
+            }
+        );
 
         $this->middlewares = new LinkedQueue();
 

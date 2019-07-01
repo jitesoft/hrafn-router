@@ -9,9 +9,11 @@ namespace Hrafn\Router;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Contracts\RouteBuilderInterface;
+use Hrafn\Router\Middleware\AnonymousMiddleware;
 use Hrafn\Router\RouteTree\Node;
 use Hrafn\Router\RouteTree\RouteTreeManager;
 use Hrafn\Router\Traits\MethodToActionTrait;
+use Jitesoft\Utilities\DataStructures\Arrays;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -126,7 +128,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
                 $method,
                 $handler,
                 $pattern,
-                $middleWares,
+                array_merge($this->middlewares, $middleWares),
                 $this->parameterExtractor
             )
         );
@@ -157,7 +159,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         }
 
         $builder = new RouteBuilder(
-            $middleWares ?? [],
+            array_merge($this->middlewares, $middleWares ?? []),
             $node,
             $this->extractor,
             $this->parameterExtractor,

@@ -11,8 +11,10 @@ use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Jitesoft\Container\Injector;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
+use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface as Request;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -66,6 +68,16 @@ class ReflectionClassHandler implements RequestHandlerInterface {
      * @throws ReflectionException              On reflection error.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
+        if ($this->action->getMiddlewares()->count() !== 0) {
+            return $this->action
+                ->getMiddlewares()
+                ->dequeue()
+                ->process(
+                    $request,
+                    $this
+                );
+        }
+
         $class = null;
         if ($this->container->has($this->className)) {
             $class = $this->container->get($this->className);
@@ -79,11 +91,25 @@ class ReflectionClassHandler implements RequestHandlerInterface {
             );
         }
 
-        $reflectionClass  = new ReflectionClass($class);
-        $reflectionMethod = $reflectionClass->getMethod($this->classMethod);
+        $reflectionClass = new ReflectionClass($class);
+        $arguments       = $this->getArguments($request, $reflectionClass);
+
+        return $class->{$this->classMethod}(...$arguments);
+    }
+
+    /**
+     * @param RequestInterface $request Request to parse.
+     * @param ReflectionClass  $class   Class to handle.
+     * @return array
+     * @throws HttpBadRequestException          On bad request.
+     * @throws ReflectionException              On errors in reflection.
+     */
+    private function getArguments(RequestInterface $request,
+                                  ReflectionClass $class): array {
+        $reflectionMethod = $class->getMethod($this->classMethod);
 
         if ($reflectionMethod->getNumberOfParameters() === 0) {
-            return $class->{$this->classMethod}();
+            return [];
         }
 
         $parsedParams = $this->parameterExtractor->getUriParameters(
@@ -127,8 +153,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
                 );
             }
         }
-
-        return $class->{$this->classMethod}(...$arguments);
+        return $arguments;
     }
 
 }

@@ -8,6 +8,7 @@
 namespace Hrafn\Router\Contracts;
 
 use Hrafn\Router\Method;
+use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
@@ -25,6 +26,13 @@ interface ActionInterface {
      * @return string
      */
     public function getMethod(): string;
+
+    /**
+     * Get all middlewares as a queue.
+     *
+     * @return QueueInterface
+     */
+    public function getMiddlewares(): QueueInterface;
 
     /**
      * Get the pattern used by the action, the pattern should not contain any group path nor query parameters and such.

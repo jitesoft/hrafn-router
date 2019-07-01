@@ -25,17 +25,18 @@ use Jitesoft\Utilities\DataStructures\Maps\ {
     MapInterface,
     SimpleMap
 };
+use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\ {
     Container\ContainerInterface,
     Log\LoggerAwareInterface,
     Log\LoggerInterface,
     Log\NullLogger
 };
-use Psr\Http\ {
+use Psr\Http\{Message\RequestInterface,
     Message\ResponseInterface,
     Message\ServerRequestInterface,
-    Server\RequestHandlerInterface,
-};
+    Server\MiddlewareInterface,
+    Server\RequestHandlerInterface};
 
 /**
  * Router
@@ -151,21 +152,10 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             );
         }
 
-        for ($i = 0; $i === 0; $i++) {
-            return $dispatcher
-                ->dispatch(
-                    $request->getMethod(),
-                    $request->getRequestTarget()
-                )
-                ->handle($request);
-        }
-
-        return $dispatcher
-            ->dispatch(
-                $request->getMethod(),
-                $request->getRequestTarget()
-            )
-            ->handle($request);
+        return $dispatcher->dispatch(
+            $request->getMethod(),
+            $request->getRequestTarget()
+        )->handle($request);
     }
 
 }

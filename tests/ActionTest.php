@@ -52,7 +52,6 @@ class ActionTest extends TestCase {
     }
 
     public function testGetPattern() {
-
         $action = new Action('get', 'Handler@method', '/test', [], new RegexParameterExtractor(new NullLogger()));
         $this->assertEquals('/test', $action->getPattern());
         $action = new Action('get', 'Handler@method', '/test/{with}/{?params}', [], new RegexParameterExtractor(new NullLogger()));

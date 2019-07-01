@@ -171,8 +171,6 @@ class CallbackHandlerTest extends TestCase {
         );
         $this->expectException(HttpBadRequestException::class);
         $handler->handle(new ServerRequest('get', '/test/123/test'));
-
-
     }
 
 }
