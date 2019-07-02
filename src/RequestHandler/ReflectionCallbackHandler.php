@@ -74,7 +74,7 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
 
         $parsedParams = $this->parameterExtractor->getUriParameters(
             $this->action->getPattern(),
-            $request->getRequestTarget()
+            trim($request->getRequestTarget(), '/')
         );
 
         // The controller does not HAVE to have the required parameters, they are just required

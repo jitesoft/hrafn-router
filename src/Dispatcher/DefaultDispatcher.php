@@ -62,14 +62,16 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
      * @throws HttpNotFoundException On path not found.
      */
     private function getNode(Node $parent, QueueInterface $parts): Node {
-        if ($parts->count() === 0 || !$parent->hasChild($parts->peek())) {
+        if (!$parent->hasChild($parts->peek())
+            && !$parent->hasChild('%PARAM%')
+        ) {
             throw new HttpNotFoundException(
                 'Could not locate the requested resource.'
             );
         }
 
         $node = $parent->getChild($parts->dequeue());
-        return ($parts->peek() === null) ? $node : $this->getNode(
+        return ($parts->count() === 0) ? $node : $this->getNode(
             $node,
             $parts
         );

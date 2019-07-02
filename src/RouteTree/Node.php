@@ -98,6 +98,10 @@ class Node {
      * @return Node|null
      */
     public function getChild(string $part): ?Node {
+        if (!$this->children->has($part)) {
+            $part = '%PARAM%';
+        }
+
         return $this->children->has($part) ? $this->children[$part] : null;
     }
 

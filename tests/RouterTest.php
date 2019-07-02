@@ -73,11 +73,11 @@ class RouterTest extends TestCase {
         $called2 = false;
 
         $router->getBuilder()->namespace('/api/v1', function (RouteBuilder $b) use(&$called1, &$called2) {
-           $b->put('/test/{user}', function() use (&$called1) {
+           $b->put('/test/{user}', function(RequestInterface $r, $user) use (&$called1) {
                $called1 = true;
                return new Response(200);
            });
-           $b->post('/test/{user}', function () use($called2) {
+           $b->post('/test/{user}', function (RequestInterface $r, $user) use(&$called2) {
                $called2 = true;
                return new Response(200);
            });

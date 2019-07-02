@@ -133,7 +133,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
             new Action(
                 $method,
                 $handler,
-                $pattern,
+                sprintf('%s/%s', $this->basePattern, $pattern),
                 array_merge($this->middlewares, $middleWares),
                 $this->parameterExtractor,
                 $this->container

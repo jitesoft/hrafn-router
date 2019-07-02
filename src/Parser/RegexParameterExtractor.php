@@ -113,7 +113,8 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             ]
         );
         // Remove the trailing slash from the path if there is one.
-        $path = rtrim($path, '/');
+        $path    = trim($path, '/');
+        $pattern = trim($pattern, '/');
 
         // To fetch the url parameters with regex, we have to replace each placeholder and optional placeholder
         // with a regular expression string. And, of course, we use regex for that too!
