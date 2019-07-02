@@ -67,6 +67,28 @@ class RouterTest extends TestCase {
         $this->assertEquals(200, $result->getStatusCode());
     }
 
+    public function testPutWithParams() {
+        $router = new Router();
+        $called1 = false;
+        $called2 = false;
+
+        $router->getBuilder()->namespace('/api/v1', function (RouteBuilder $b) use(&$called1, &$called2) {
+           $b->put('/test/{user}', function() use (&$called1) {
+               $called1 = true;
+               return new Response(200);
+           });
+           $b->post('/test/{user}', function () use($called2) {
+               $called2 = true;
+               return new Response(200);
+           });
+        });
+
+        $result = $router->handle(new ServerRequest('put', '/api/v1/test/abc'));
+        $this->assertTrue($called1);
+        $this->assertFalse($called2);
+    }
+
+
 }
 
 class Test_Middleware implements MiddlewareInterface {

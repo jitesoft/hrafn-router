@@ -143,7 +143,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $dispatcher = null;
         if ($this->container->has(DispatcherInterface::class)) {
-            $this->container->get(DispatcherInterface::class);
+            $dispatcher = $this->container->get(DispatcherInterface::class);
         } else {
             $dispatcher = new DefaultDispatcher(
                 $this->rootNode,
