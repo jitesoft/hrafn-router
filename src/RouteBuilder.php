@@ -15,6 +15,7 @@ use Hrafn\Router\RouteTree\RouteTreeManager;
 use Hrafn\Router\Traits\MethodToActionTrait;
 use Jitesoft\Utilities\DataStructures\Arrays;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -42,17 +43,20 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     private $actionContainer;
     /** @var ParameterExtractorInterface */
     private $parameterExtractor;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
      * RouteBuilder constructor.
-     * @param array                       $middlewares        List of middlewares.
-     * @param Node                        $node               Root node.
-     * @param PathExtractorInterface      $extractor          Path extractor object.
-     * @param ParameterExtractorInterface $parameterExtractor Parameter extractor object.
-     * @param RouteTreeManager            $manager            RouteTree manager.
-     * @param string                      $basePattern        Base pattern of current node.
-     * @param LoggerInterface             $logger             Logger to use.
-     * @param MapInterface                $actionContainer    Container which actions is stored in.
+     * @param array                           $middlewares        List of middlewares.
+     * @param Node                            $node               Root node.
+     * @param PathExtractorInterface          $extractor          Path extractor object.
+     * @param ParameterExtractorInterface     $parameterExtractor Parameter extractor object.
+     * @param RouteTreeManager                $manager            RouteTree manager.
+     * @param string                          $basePattern        Base pattern of current node.
+     * @param LoggerInterface                 $logger             Logger to use.
+     * @param MapInterface                    $actionContainer    Container which actions is stored in.
+     * @param ContainerInterface|MapInterface $container          Dependency container to use for injection.
      */
     public function __construct(array $middlewares,
                                 Node $node,
@@ -61,7 +65,8 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
                                 RouteTreeManager $manager,
                                 string $basePattern,
                                 LoggerInterface $logger,
-                                MapInterface $actionContainer) {
+                                MapInterface $actionContainer,
+                                $container = null) {
         $this->root               = $node;
         $this->middlewares        = $middlewares;
         $this->extractor          = $extractor;
@@ -70,6 +75,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $this->actionContainer    = $actionContainer;
         $this->logger             = $logger;
         $this->parameterExtractor = $parameterExtractor;
+        $this->container          = $container;
     }
 
     /**
@@ -129,7 +135,8 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
                 $handler,
                 $pattern,
                 array_merge($this->middlewares, $middleWares),
-                $this->parameterExtractor
+                $this->parameterExtractor,
+                $this->container
             )
         );
         return $this;
@@ -166,7 +173,8 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
             $this->manager,
             sprintf('%s/%s', $this->basePattern, $pattern),
             $this->logger,
-            $this->actionContainer
+            $this->actionContainer,
+            $this->container
         );
 
         $closure($builder);

@@ -105,7 +105,8 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             $this->routeTreeManager,
             '',
             $this->logger,
-            $this->actions
+            $this->actions,
+            $this->container
         );
     }
 

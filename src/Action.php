@@ -16,6 +16,7 @@ use function is_callable;
 use Jitesoft\Container\Container;
 use Jitesoft\Exceptions\Psr\Container\ContainerException;
 use Jitesoft\Utilities\DataStructures\Arrays;
+use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
@@ -40,12 +41,12 @@ class Action implements ActionInterface {
 
     /**
      * Action constructor.
-     * @param string                      $method             Method of the given action.
-     * @param string|callable             $handler            Action callback handler.
-     * @param string                      $pattern            Pattern the action uses.
-     * @param array                       $middlewares        Middlewares to use.
-     * @param ParameterExtractorInterface $parameterExtractor Parameter extractor object.
-     * @param ContainerInterface|null     $container          Dependency container.
+     * @param string                          $method             Method of the given action.
+     * @param string|callable                 $handler            Action callback handler.
+     * @param string                          $pattern            Pattern the action uses.
+     * @param array                           $middlewares        Middlewares to use.
+     * @param ParameterExtractorInterface     $parameterExtractor Parameter extractor object.
+     * @param ContainerInterface|MapInterface $container          Dependency container.
      *
      * @internal
      */
@@ -54,7 +55,7 @@ class Action implements ActionInterface {
                                 string $pattern,
                                 array $middlewares,
                                 ParameterExtractorInterface $parameterExtractor,
-                                ContainerInterface $container = null) {
+                                $container = null) {
         $this->method  = $method;
         $this->pattern = $pattern;
 
@@ -84,10 +85,11 @@ class Action implements ActionInterface {
             function ($middleware) use($container) {
                 if (is_callable($middleware)) {
                     return new AnonymousMiddleware($middleware);
-                } if (is_string($middleware)) {
-                    if ($container->has($middleware)) {
-                        return $container[$middleware];
-                    }
+                } if (is_string($middleware)
+                    && $container
+                    && $container->has($middleware)
+                ) {
+                    return $container[$middleware];
                 }
 
                 return $middleware;
