@@ -154,7 +154,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
         return $dispatcher->dispatch(
             $request->getMethod(),
-            $request->getRequestTarget()
+            $request->getUri()->getPath()
         )->handle($request);
     }
 
