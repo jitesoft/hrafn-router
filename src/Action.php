@@ -81,10 +81,15 @@ class Action implements ActionInterface {
 
         $middlewares = Arrays::map(
             $middlewares,
-            function ($middleware) {
+            function ($middleware) use($container) {
                 if (is_callable($middleware)) {
                     return new AnonymousMiddleware($middleware);
+                } if (is_string($middleware)) {
+                    if ($container->has($middleware)) {
+                        return $container[$middleware];
+                    }
                 }
+
                 return $middleware;
             }
         );
