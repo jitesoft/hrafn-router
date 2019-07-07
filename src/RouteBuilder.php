@@ -148,12 +148,12 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      *
      * @param string     $pattern     Pattern for the namespace/group.
      * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array|null $middleWares Create a new route namespace/group.
+     * @param array      $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function namespace(string $pattern,
                               callable $closure,
-                              ?array $middleWares = []): RouteBuilderInterface {
+                              array $middleWares = []): RouteBuilderInterface {
         $pattern = $this->cleanupPattern($pattern);
 
         $pathParts = $this->extractor->getUriParts($pattern);
@@ -188,12 +188,12 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      *
      * @param string     $pattern     Pattern for the namespace/group.
      * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array|null $middleWares Create a new route namespace/group.
+     * @param array      $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function group(string $pattern,
                           callable $closure,
-                          ?array $middleWares = []): RouteBuilderInterface {
+                          array $middleWares = []): RouteBuilderInterface {
         return $this->namespace($pattern, $closure, $middleWares);
     }
 

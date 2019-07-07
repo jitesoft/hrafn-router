@@ -26,6 +26,20 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class RouterTest extends TestCase {
 
+    public function testIndex() {
+        $router = new Router();
+        $wasCalled = false;
+        $router->getBuilder()->get('/', function() use (&$wasCalled) {
+            $wasCalled = true;
+            return new Response(200);
+        });
+
+        $result = $router->handle(new ServerRequest('get', ''));
+        $this->assertTrue($wasCalled);
+        $this->assertEquals(200, $result->getStatusCode());
+
+    }
+
     public function testHandle() {
         $router = new Router();
 

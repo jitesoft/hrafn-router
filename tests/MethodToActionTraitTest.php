@@ -188,7 +188,7 @@ class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
         return $this->errors;
     }
 
-    public function namespace(string $pattern, callable $closure,  ?array $middleWares): RouteBuilderInterface { }
+    public function namespace(string $pattern, callable $closure,  array $middleWares = []): RouteBuilderInterface { }
 
     /**
      * Create a new group inside of current group.
@@ -197,10 +197,10 @@ class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
      *
      * @param string     $pattern
      * @param callable   $closure
-     * @param array|null $middleWares
+     * @param array      $middleWares
      * @return RouteBuilderInterface
      */
-    public function group(string $pattern, callable $closure, ?array $middleWares): RouteBuilderInterface {
+    public function group(string $pattern, callable $closure, array $middleWares = []): RouteBuilderInterface {
         $this->namespace($pattern, $closure, $middleWares);
     }
 }

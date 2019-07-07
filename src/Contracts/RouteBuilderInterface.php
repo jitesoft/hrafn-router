@@ -129,12 +129,12 @@ interface RouteBuilderInterface {
      *
      * @param string     $pattern     Pattern for the namespace/group.
      * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array|null $middleWares Create a new route namespace/group.
+     * @param array      $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function namespace(string $pattern,
                               callable $closure,
-                              ?array $middleWares): self;
+                              array $middleWares = []): self;
 
     /**
      * Create a new group inside of current group.
@@ -143,11 +143,11 @@ interface RouteBuilderInterface {
      *
      * @param string     $pattern     Pattern for the namespace/group.
      * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array|null $middleWares Create a new route namespace/group.
+     * @param array      $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function group(string $pattern,
                           callable $closure,
-                          ?array $middleWares): self;
+                          array $middleWares = []): self;
 
 }
