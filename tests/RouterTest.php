@@ -38,6 +38,11 @@ class RouterTest extends TestCase {
         $this->assertTrue($wasCalled);
         $this->assertEquals(200, $result->getStatusCode());
 
+        $wasCalled = false;
+        $result = $router->handle(new ServerRequest('get', '/'));
+        $this->assertTrue($wasCalled);
+        $this->assertEquals(200, $result->getStatusCode());
+
     }
 
     public function testHandle() {

@@ -91,15 +91,18 @@ class RegexPathExtractor implements PathExtractorInterface {
                 'count' => count($list)
             ]
         );
-
-        if ($list[0] === '') {
-            $list = array_slice($list, 1);
-        }
-        if ($list[count($list) - 1] === '') {
-            array_pop($list);
-        }
-
         $queue = new LinkedQueue();
+        if (empty($path) || $path === '/') {
+            $list = [''];
+        } else {
+            if ($list[0] === '') {
+                $list = array_slice($list, 1);
+            }
+            if (count($list) !== 0 && $list[count($list) - 1] === '') {
+                array_pop($list);
+            }
+        }
+
         $queue->enqueue(...$list);
         return $queue;
     }
