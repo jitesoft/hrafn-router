@@ -27,6 +27,8 @@ use Psr\Log\LoggerInterface;
 class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     use MethodToActionTrait;
 
+    /** @var string */
+    public const LOG_TAG = 'Hrafn\RouteBuilder:';
     /** @var Node */
     private $root;
     /** @var array */
@@ -100,6 +102,10 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         while ($parts->count() > 0) {
             $node = $this->manager->createOrGetNode($node, $parts->dequeue());
         }
+        $this->logger->debug(
+            '{tag} Node fetched from the manager.',
+            [ 'tag' => self::LOG_TAG ]
+        );
 
         return $node;
     }
@@ -139,6 +145,11 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
                 $this->container
             )
         );
+        $this->logger->debug(
+            '{tag} Action added to node, reference generated successfully.',
+            [ 'tag' => self::LOG_TAG ]
+        );
+
         return $this;
     }
 
@@ -146,9 +157,9 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * Create a new namespace inside of current namespace.
      * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      *
-     * @param string     $pattern     Pattern for the namespace/group.
-     * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array      $middleWares Create a new route namespace/group.
+     * @param string   $pattern     Pattern for the namespace/group.
+     * @param callable $closure     Closure which will be passed the route builder.
+     * @param array    $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function namespace(string $pattern,
@@ -186,9 +197,9 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      * @alias namespace
      *
-     * @param string     $pattern     Pattern for the namespace/group.
-     * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array      $middleWares Create a new route namespace/group.
+     * @param string   $pattern     Pattern for the namespace/group.
+     * @param callable $closure     Closure which will be passed the route builder.
+     * @param array    $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function group(string $pattern,

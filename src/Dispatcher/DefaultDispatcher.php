@@ -4,13 +4,13 @@
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 namespace Hrafn\Router\Dispatcher;
 
 use Hrafn\Router\Contracts\ActionInterface;
 use Hrafn\Router\Contracts\DispatcherInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Parser\RegexPathExtractor;
+use Hrafn\Router\Router;
 use Hrafn\Router\RouteTree\Node;
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
@@ -65,6 +65,11 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
         if (!$parent->hasChild($parts->peek())
             && !$parent->hasChild('%PARAM%')
         ) {
+            $this->logger->error(
+                '{tag} Tried to fetch a resource that did not exist.',
+                [ 'tag' => Router::LOG_TAG ]
+            );
+
             throw new HttpNotFoundException(
                 'Could not locate the requested resource.'
             );
@@ -98,6 +103,10 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
             throw new HttpNotFoundException();
         }
 
+        $this->logger->debug(
+            '{tag} Handler found with default dispatcher.',
+            [ 'tag' => Router::LOG_TAG ]
+        );
         return $this->actions[$reference]->getHandler();
     }
 

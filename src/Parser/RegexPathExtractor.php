@@ -22,7 +22,6 @@ use Psr\Log\LoggerInterface;
  *
  */
 class RegexPathExtractor implements PathExtractorInterface {
-
     /** @var LoggerInterface */
     private $logger;
     /** @var string */
@@ -63,8 +62,10 @@ class RegexPathExtractor implements PathExtractorInterface {
      */
     public function getUriParts(string $path): QueueInterface {
         $this->logger->debug(
-            '{tag} Extracting URI Paths from the supplied route path.', [
-                'tag' => Router::LOG_TAG
+            '{tag} Extracting URI Paths from the supplied route path [{path}].',
+            [
+                'tag'  => Router::LOG_TAG,
+                'path' => $path
             ]
         );
         $format  = '%s%s%s';
@@ -93,6 +94,10 @@ class RegexPathExtractor implements PathExtractorInterface {
         );
         $queue = new LinkedQueue();
         if (empty($path) || $path === '/') {
+            $this->logger->debug(
+                '{tag} Path was empty or root.',
+                [ 'tag' => Router::LOG_TAG ]
+            );
             $list = [''];
         } else {
             if ($list[0] === '') {

@@ -127,9 +127,9 @@ interface RouteBuilderInterface {
      * Create a new namespace inside of current namespace.
      * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      *
-     * @param string     $pattern     Pattern for the namespace/group.
-     * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array      $middleWares Create a new route namespace/group.
+     * @param string   $pattern     Pattern for the namespace/group.
+     * @param callable $closure     Closure which will be passed the route builder.
+     * @param array    $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function namespace(string $pattern,
@@ -141,9 +141,9 @@ interface RouteBuilderInterface {
      * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      * @alias namespace
      *
-     * @param string     $pattern     Pattern for the namespace/group.
-     * @param callable   $closure     Closure which will be passed the route builder.
-     * @param array      $middleWares Create a new route namespace/group.
+     * @param string   $pattern     Pattern for the namespace/group.
+     * @param callable $closure     Closure which will be passed the route builder.
+     * @param array    $middleWares Create a new route namespace/group.
      * @return RouteBuilderInterface
      */
     public function group(string $pattern,

@@ -153,6 +153,11 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             );
         }
 
+        $this->logger->debug(
+            '{tag} Created dispatcher, calling dispatch with supplied request.',
+            [ 'tag' => self::LOG_TAG ]
+        );
+
         return $dispatcher->dispatch(
             $request->getMethod(),
             $request->getUri()->getPath()
