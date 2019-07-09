@@ -7,7 +7,7 @@
 
 namespace Hrafn\Router;
 
-use Hrafn\Router\ {
+use Hrafn\Router\{Cache\FileCache,
     Contracts\DispatcherInterface,
     Contracts\ParameterExtractorInterface,
     Contracts\RouteBuilderInterface,
@@ -16,8 +16,7 @@ use Hrafn\Router\ {
     Parser\RegexParameterExtractor as ParamExtractor,
     Parser\RegexPathExtractor as PathExtractor,
     RouteTree\Node,
-    RouteTree\RouteTreeManager
-};
+    RouteTree\RouteTreeManager};
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
@@ -26,12 +25,11 @@ use Jitesoft\Utilities\DataStructures\Maps\ {
     SimpleMap
 };
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
-use Psr\ {
+use Psr\{Cache\CacheItemPoolInterface,
     Container\ContainerInterface,
     Log\LoggerAwareInterface,
     Log\LoggerInterface,
-    Log\NullLogger
-};
+    Log\NullLogger};
 use Psr\Http\{Message\RequestInterface,
     Message\ResponseInterface,
     Message\ServerRequestInterface,
@@ -64,12 +62,16 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     private $paramExtractor;
     /** @var Node */
     private $rootNode;
+    /** @var CacheItemPoolInterface */
+    private $cache;
 
     /**
      * Router constructor.
+     *
      * @param ContainerInterface|null $container Dependency container.
+     * @throws InvalidArgumentException
      */
-    public function __construct(?ContainerInterface $container = null) {
+    public function __construct(string $cacheDir, ?ContainerInterface $container = null) {
         $this->container = $container ?? new SimpleMap();
 
         $get = function($name, $default) {
@@ -78,6 +80,11 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             }
             return $this->container->get($name);
         };
+
+        $this->cache  = $get(
+            CacheItemPoolInterface::class,
+            new FileCache(sys_get_temp_dir(), 'hrafn-routes.cache')
+        );
 
         $this->logger = $get(
             LoggerInterface::class,
@@ -94,8 +101,10 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             new ParamExtractor($this->logger)
         );
 
+        $actionsCache = $this->cache->hasItem('actions') ? $this->cache->getItem('actions') : [];
+
         $this->routeTreeManager = new RouteTreeManager($this->logger);
-        $this->actions          = new SimpleMap();
+        $this->actions          = new SimpleMap($actionsCache);
         $this->rootNode         = new Node(null, '');
         $this->routeBuilder     = new RouteBuilder(
             [],
@@ -127,7 +136,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * @return RouteBuilderInterface
      */
-    public function getBuilder () {
+    public function getBuilder (): RouteBuilderInterface {
         return $this->routeBuilder;
     }
 

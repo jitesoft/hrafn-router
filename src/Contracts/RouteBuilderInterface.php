@@ -4,7 +4,6 @@
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 namespace Hrafn\Router\Contracts;
 
 /**
