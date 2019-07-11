@@ -7,10 +7,12 @@
 
 namespace Hrafn\Router\Tests;
 
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use Hrafn\Router\RouteBuilder;
 use Hrafn\Router\Router;
+use Jitesoft\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -77,7 +79,7 @@ class RouterTest extends TestCase {
                 $request->getBody()->write('1');
                 return $handler->handle($request);
             },
-            new Test_Middleware($callOrder)
+            new Test_Middleware()
         ]);
 
         $result = $router->handle(new ServerRequest('get', '/test/test'));
@@ -107,16 +109,49 @@ class RouterTest extends TestCase {
         $this->assertFalse($called2);
     }
 
+    public function testMiddlewareToggle() {
+        $router = new Router(new Container([
+            Test_Middleware::class => Test_Middleware::class
+        ]));
+
+        $router->getBuilder()->get(
+            'test',
+            function (Request $request) {
+                $request->getBody()->rewind();
+                $content = $request->getBody()->getContents();
+                $content .= '1';
+                return new Response(123, [], $content);
+            },
+            [ Test_Middleware::class ]
+        );
+
+        Router::disableMiddleware(Test_Middleware::class);
+        $result = $router->handle(new ServerRequest('GET', 'test/'));
+        $this->assertEquals(123, $result->getStatusCode());
+        $result->getBody()->rewind();
+        $this->assertEquals('1', $result->getBody()->read(16));
+
+        $router->getBuilder()->post(
+            'test2',
+            function (Request $request) {
+                $request->getBody()->rewind();
+                $res = $request->getBody()->getContents();
+                $res .= '1';
+                return new Response(123, [], $res);
+            },
+            [ Test_Middleware::class ]
+        );
+
+        Router::enableMiddleware(Test_Middleware::class);
+        $result = $router->handle(new ServerRequest('POST', 'test2'));
+        $result->getBody()->rewind();
+        $this->assertEquals('21', $result->getBody()->read(16));
+    }
 
 }
 
 class Test_Middleware implements MiddlewareInterface {
-
-    private $callOrder = null;
-    public function __construct(&$callOrder) { $callOrder = $callOrder; }
-
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
-        $this->callOrder .= '2';
         $request->getBody()->write('2');
         return $handler->handle($request);
     }
