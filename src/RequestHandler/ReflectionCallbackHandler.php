@@ -25,6 +25,7 @@ use ReflectionFunction;
  * @version 1.0.0
  */
 class ReflectionCallbackHandler implements RequestHandlerInterface {
+    use HandleMiddlewareTrait;
     /** @var callable */
     private $callback;
     /** @var ParameterExtractorInterface */
@@ -56,25 +57,7 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         if ($this->action->getMiddlewares()->count() !== 0) {
-            if (count(Router::$disabledMiddleware) > 0) {
-                $disabled = in_array(
-                    get_class($this->action->getMiddlewares()->peek()),
-                    Router::$disabledMiddleware
-                );
-
-                if ($disabled) {
-                    $this->action->getMiddlewares()->dequeue();
-                    return $this->handle($request);
-                }
-            }
-
-            return $this->action
-                ->getMiddlewares()
-                ->dequeue()
-                ->process(
-                    $request,
-                    $this
-                );
+            return $this->process($request);
         }
 
         $reflect    = new ReflectionFunction($this->callback);

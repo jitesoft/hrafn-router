@@ -28,6 +28,7 @@ use ReflectionException;
  * @version 1.0.0
  */
 class ReflectionClassHandler implements RequestHandlerInterface {
+    use HandleMiddlewareTrait;
     /** @var string */
     private $className;
     /** @var string */
@@ -70,25 +71,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         if ($this->action->getMiddlewares()->count() !== 0) {
-            if (count(Router::$disabledMiddleware) > 0) {
-                $disabled = in_array(
-                    get_class($this->action->getMiddlewares()->peek()),
-                    Router::$disabledMiddleware
-                );
-
-                if ($disabled) {
-                    $this->action->getMiddlewares()->dequeue();
-                    return $this->handle($request);
-                }
-            }
-
-            return $this->action
-                ->getMiddlewares()
-                ->dequeue()
-                ->process(
-                    $request,
-                    $this
-                );
+            return $this->process($request);
         }
 
         $class = null;
