@@ -45,7 +45,6 @@ use Psr\Http\{Message\RequestInterface,
  * @version 1.0.0
  */
 class Router implements LoggerAwareInterface, RequestHandlerInterface {
-
     /** @var string */
     public const LOG_TAG = 'Hrafn\Router:';
     /** @var LoggerInterface */
@@ -64,6 +63,42 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     private $paramExtractor;
     /** @var Node */
     private $rootNode;
+
+    /**
+     * Middlewares marked as disabled.
+     * This array should not be directly accessed, use the
+     * Router::enable/disable - Middleware functions instead.
+     * I.E., this array should be seen as internal, but needs to be reachable from friend classes.
+     *
+     * @var array|string[]
+     */
+    public static $disabledMiddleware = [];
+
+    /**
+     * Mark middleware as enabled.
+     *
+     * @param string ...$middleware Middleware or middlewares to enable.
+     * @return void
+     */
+    public static function enableMiddleware(string ...$middleware): void {
+        self::$disabledMiddleware = array_filter(
+            self::$disabledMiddleware,
+            function(string $m) use($middleware) {
+                return !in_array($m, $middleware);
+            }
+        );
+        echo count(self::$disabledMiddleware);
+    }
+
+    /**
+     * Mark a middleware as disabled.
+     *
+     * @param string ...$middleware Middleware or middlewares to disable.
+     * @return void
+     */
+    public static function disableMiddleware(string ...$middleware): void {
+        array_push(self::$disabledMiddleware, ...$middleware);
+    }
 
     /**
      * Router constructor.

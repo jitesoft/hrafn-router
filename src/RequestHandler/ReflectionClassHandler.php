@@ -8,6 +8,7 @@ namespace Hrafn\Router\RequestHandler;
 
 use Hrafn\Router\Action;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
+use Hrafn\Router\Router;
 use Jitesoft\Container\Injector;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
@@ -27,6 +28,7 @@ use ReflectionException;
  * @version 1.0.0
  */
 class ReflectionClassHandler implements RequestHandlerInterface {
+    use HandleMiddlewareTrait;
     /** @var string */
     private $className;
     /** @var string */
@@ -69,13 +71,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         if ($this->action->getMiddlewares()->count() !== 0) {
-            return $this->action
-                ->getMiddlewares()
-                ->dequeue()
-                ->process(
-                    $request,
-                    $this
-                );
+            return $this->process($request);
         }
 
         $class = null;
