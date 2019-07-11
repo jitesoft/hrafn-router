@@ -68,6 +68,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * Middlewares marked as disabled.
      * This array should not be directly accessed, use the
      * Router::enable/disable - Middleware functions instead.
+     * I.E., this array should be seen as internal, but needs to be reachable from friend classes.
      *
      * @var array|string[]
      */
