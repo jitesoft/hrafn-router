@@ -8,6 +8,7 @@ namespace Hrafn\Router\RequestHandler;
 
 use Hrafn\Router\Action;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
+use Hrafn\Router\Router;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -55,6 +56,18 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         if ($this->action->getMiddlewares()->count() !== 0) {
+            if (count(Router::$disabledMiddleware) > 0) {
+                $disabled = in_array(
+                    get_class($this->action->getMiddlewares()->peek()),
+                    Router::$disabledMiddleware
+                );
+
+                if ($disabled) {
+                    $this->action->getMiddlewares()->dequeue();
+                    return $this->handle($request);
+                }
+            }
+
             return $this->action
                 ->getMiddlewares()
                 ->dequeue()
