@@ -66,18 +66,20 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
     /**
      * Middlewares marked as disabled.
+     * This array should not be directly accessed, use the
+     * Router::enable/disable - Middleware functions instead.
      *
-     * @var array
-     * @internal
+     * @var array|string[]
      */
     public static $disabledMiddleware = [];
 
     /**
      * Mark middleware as enabled.
      *
-     * @param string ...$middleware
+     * @param string ...$middleware Middleware or middlewares to enable.
+     * @return void
      */
-    public static function enableMiddleware(...$middleware): void {
+    public static function enableMiddleware(string ...$middleware): void {
         self::$disabledMiddleware = array_filter(
             self::$disabledMiddleware,
             function(string $m) use($middleware) {
@@ -90,10 +92,10 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * Mark a middleware as disabled.
      *
-     * @param string ...$middleware
+     * @param string ...$middleware Middleware or middlewares to disable.
      * @return void
      */
-    public static function disableMiddleware(...$middleware): void {
+    public static function disableMiddleware(string ...$middleware): void {
         array_push(self::$disabledMiddleware, ...$middleware);
     }
 
