@@ -24,9 +24,9 @@ use Psr\Log\LoggerInterface;
  */
 class RegexPathExtractor implements PathExtractorInterface {
     private LoggerInterface $logger;
-    private string          $delimiter;
-    private string          $optionalPattern;
-    private string          $requiredPattern;
+    private string $delimiter;
+    private string $optionalPattern;
+    private string $requiredPattern;
 
     /**
      * RegexPathExtractor constructor.
@@ -34,8 +34,8 @@ class RegexPathExtractor implements PathExtractorInterface {
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger = $logger;
-        $this->delimiter = '~';
+        $this->logger          = $logger;
+        $this->delimiter       = '~';
         $this->optionalPattern = '\{\?(\w+)\}';
         $this->requiredPattern = '\{(\w+?)\}';
     }
@@ -57,7 +57,6 @@ class RegexPathExtractor implements PathExtractorInterface {
      *
      * @param string $path Path to extract uri parts from.
      * @return QueueInterface
-     * @throws InvalidArgumentException
      */
     public function getUriParts(string $path): QueueInterface {
         $this->logger->debug(
@@ -67,7 +66,7 @@ class RegexPathExtractor implements PathExtractorInterface {
                 'path' => $path
             ]
         );
-        $format = '%s%s%s';
+        $format  = '%s%s%s';
         $replace = [
             sprintf(
                 $format,
@@ -107,6 +106,7 @@ class RegexPathExtractor implements PathExtractorInterface {
             }
         }
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $queue->enqueue(...$list);
         return $queue;
     }

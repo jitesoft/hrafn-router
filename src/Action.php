@@ -31,10 +31,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 class Action implements ActionInterface {
     private const HANDLER_SEPARATOR = '@';
 
-    private string                  $method;
+    private string $method;
     private RequestHandlerInterface $handler;
-    private string                  $pattern;
-    private LinkedQueue             $middlewares;
+    private string $pattern;
+    private LinkedQueue $middlewares;
 
     /**
      * Action constructor.
@@ -56,7 +56,7 @@ class Action implements ActionInterface {
         ParameterExtractorInterface $parameterExtractor,
         $container = null
     ) {
-        $this->method = $method;
+        $this->method  = $method;
         $this->pattern = $pattern;
 
         if (is_callable($handler)) {

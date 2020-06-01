@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
  * @version 1.0.0
  */
 class RouteTreeManager implements LoggerAwareInterface {
-    private SimpleMap       $rootNodes;
+    private SimpleMap $rootNodes;
     private LoggerInterface $logger;
 
     /**
@@ -27,7 +27,7 @@ class RouteTreeManager implements LoggerAwareInterface {
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger = $logger;
+        $this->logger    = $logger;
         $this->rootNodes = new SimpleMap();
     }
 

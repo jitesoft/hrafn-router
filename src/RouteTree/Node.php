@@ -20,10 +20,10 @@ use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
  * @state   Unstable
  */
 class Node {
-    private ?Node        $parent;
+    private ?Node $parent;
     private MapInterface $children;
     private MapInterface $references;
-    private string       $part;
+    private string $part;
 
     /**
      * RouteNode constructor.
@@ -33,9 +33,9 @@ class Node {
      * @internal
      */
     public function __construct(?Node $parent, string $part) {
-        $this->part = $part;
-        $this->parent = $parent;
-        $this->children = new SimpleMap();
+        $this->part       = $part;
+        $this->parent     = $parent;
+        $this->children   = new SimpleMap();
         $this->references = new SimpleMap();
     }
 

@@ -45,10 +45,12 @@ trait HandleMiddlewareTrait {
         $middleware = $this->action->getMiddlewares()->dequeue();
         if (is_string($middleware)) {
 
-            if($this->container->has($middleware)) {
+            if ($this->container->has($middleware)) {
                 $middleware = $this->container->get($middleware);
             } else {
-                throw new HttpInternalServerErrorException('Middleware {name} was not found in the container nor was it an instance.');
+                throw new HttpInternalServerErrorException(
+                    'Middleware {name} was not found in the container nor was it an instance.'
+                );
             }
 
         }

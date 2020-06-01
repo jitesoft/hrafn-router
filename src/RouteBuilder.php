@@ -30,13 +30,13 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
 
     public const LOG_TAG = 'Hrafn\RouteBuilder:';
 
-    private Node                        $root;
-    private array                       $middlewares;
-    private PathExtractorInterface      $extractor;
-    private RouteTreeManager            $manager;
-    private string                      $basePattern;
-    private LoggerInterface             $logger;
-    private MapInterface                $actionContainer;
+    private Node $root;
+    private array $middlewares;
+    private PathExtractorInterface $extractor;
+    private RouteTreeManager $manager;
+    private string $basePattern;
+    private LoggerInterface $logger;
+    private MapInterface $actionContainer;
     private ParameterExtractorInterface $parameterExtractor;
     /** @var MapInterface|ContainerInterface|null */
     private                             $container;
@@ -65,15 +65,15 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         MapInterface $actionContainer,
         $container = null
     ) {
-        $this->root = $node;
-        $this->middlewares = $middlewares;
-        $this->extractor = $extractor;
-        $this->manager = $manager;
-        $this->basePattern = $this->cleanupPattern($basePattern);
-        $this->actionContainer = $actionContainer;
-        $this->logger = $logger;
+        $this->root               = $node;
+        $this->middlewares        = $middlewares;
+        $this->extractor          = $extractor;
+        $this->manager            = $manager;
+        $this->basePattern        = $this->cleanupPattern($basePattern);
+        $this->actionContainer    = $actionContainer;
+        $this->logger             = $logger;
         $this->parameterExtractor = $parameterExtractor;
-        $this->container = $container;
+        $this->container          = $container;
     }
 
     /**
@@ -90,7 +90,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      */
     private function getOrCreateNode(string $pattern): Node {
         $parts = $this->extractor->getUriParts($pattern);
-        $node = $this->manager->createOrGetNode(
+        $node  = $this->manager->createOrGetNode(
             $this->root,
             $parts->dequeue()
         );
@@ -121,7 +121,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $handler,
         array $middleWares = []
     ): RouteBuilderInterface {
-        $pattern = $this->cleanupPattern($pattern);
+        $pattern   = $this->cleanupPattern($pattern);
         $reference = sprintf(
             '%s::%s/%s',
             $method,
@@ -168,8 +168,8 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         $pattern = $this->cleanupPattern($pattern);
 
         $pathParts = $this->extractor->getUriParts($pattern);
-        $node = $this->root;
-        $part = $pathParts->dequeue();
+        $node      = $this->root;
+        $part      = $pathParts->dequeue();
 
         while ($part !== null) {
             $node = $this->manager->createOrGetNode($node, $part);

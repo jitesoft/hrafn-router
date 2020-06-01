@@ -51,13 +51,13 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
     /** @var MapInterface|ContainerInterface */
     private                             $container;
-    private LoggerInterface             $logger;
-    private RouteBuilderInterface       $routeBuilder;
-    private SimpleMap                   $actions;
-    private RouteTreeManager            $routeTreeManager;
-    private PathExtractorInterface      $pathExtractor;
+    private LoggerInterface $logger;
+    private RouteBuilderInterface $routeBuilder;
+    private SimpleMap $actions;
+    private RouteTreeManager $routeTreeManager;
+    private PathExtractorInterface $pathExtractor;
     private ParameterExtractorInterface $paramExtractor;
-    private Node                        $rootNode;
+    private Node $rootNode;
 
     /**
      * Middlewares marked as disabled.
@@ -125,9 +125,9 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         );
 
         $this->routeTreeManager = new RouteTreeManager($this->logger);
-        $this->actions = new SimpleMap();
-        $this->rootNode = new Node(null, '');
-        $this->routeBuilder = new RouteBuilder(
+        $this->actions          = new SimpleMap();
+        $this->rootNode         = new Node(null, '');
+        $this->routeBuilder     = new RouteBuilder(
             [],
             $this->rootNode,
             $this->pathExtractor,
@@ -169,11 +169,11 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * @throws HttpMethodNotAllowedException On invalid http method.
      * @throws HttpNotFoundException         On invalid path.
      * @throws InvalidArgumentException      On invalid argument.
-     * @throws InvalidKeyException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $dispatcher = null;
         if ($this->container->has(DispatcherInterface::class)) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $dispatcher = $this->container->get(DispatcherInterface::class);
         } else {
             $dispatcher = new DefaultDispatcher(

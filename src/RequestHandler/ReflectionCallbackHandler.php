@@ -26,9 +26,9 @@ use ReflectionFunction;
 class ReflectionCallbackHandler implements RequestHandlerInterface {
     use HandleMiddlewareTrait;
 
-    private Closure                     $callback;
+    private Closure $callback;
     private ParameterExtractorInterface $parameterExtractor;
-    private Action                      $action;
+    private Action $action;
 
     /**
      * ReflectionCallbackHandler constructor.
@@ -42,9 +42,9 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
         ParameterExtractorInterface $parameterExtractor,
         Action $action
     ) {
-        $this->callback = $callback;
+        $this->callback           = $callback;
         $this->parameterExtractor = $parameterExtractor;
-        $this->action = $action;
+        $this->action             = $action;
     }
 
     /**
@@ -60,7 +60,7 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
             return $this->process($request);
         }
 
-        $reflect = new ReflectionFunction($this->callback);
+        $reflect    = new ReflectionFunction($this->callback);
         $parameters = $reflect->getParameters();
 
         $arguments = [];

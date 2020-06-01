@@ -31,9 +31,9 @@ use Psr\Log\NullLogger;
 class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
 
     private ?PathExtractorInterface $pathExtractor = null;
-    private ?LoggerInterface        $logger        = null;
-    private ?Node                   $root          = null;
-    private ?MapInterface           $actions       = null;
+    private ?LoggerInterface $logger               = null;
+    private ?Node $root                            = null;
+    private ?MapInterface $actions                 = null;
 
     /**
      * DefaultDispatcher constructor.
@@ -49,12 +49,12 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
         ?PathExtractorInterface $pathExtractor = null,
         ?LoggerInterface $logger = null
     ) {
-        $this->logger = $logger ?? new NullLogger();
-        $this->root = $rootNode;
-        $this->actions = $actions;
+        $this->logger        = $logger ?? new NullLogger();
+        $this->root          = $rootNode;
+        $this->actions       = $actions;
         $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor(
-                $this->logger
-            );
+            $this->logger
+        );
     }
 
     /**
@@ -96,8 +96,8 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
     ): RequestHandlerInterface {
         // The following exception is deprecated in the base class and should not be able to be thrown.
         /** @noinspection PhpUnhandledExceptionInspection */
-        $parts = $this->pathExtractor->getUriParts($target);
-        $node = $this->getNode($this->root, $parts);
+        $parts     = $this->pathExtractor->getUriParts($target);
+        $node      = $this->getNode($this->root, $parts);
         $reference = $node->getReference(mb_strtolower($method));
 
         if (!$reference) {

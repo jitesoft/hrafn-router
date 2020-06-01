@@ -32,11 +32,11 @@ use ReflectionException;
 class ReflectionClassHandler implements RequestHandlerInterface {
     use HandleMiddlewareTrait;
 
-    private string                      $className;
-    private string                      $classMethod;
+    private string $className;
+    private string $classMethod;
     private ParameterExtractorInterface $parameterExtractor;
-    private Action                      $action;
-    private ContainerInterface          $container;
+    private Action $action;
+    private ContainerInterface $container;
 
     /**
      * ReflectionClassHandler constructor.
@@ -54,11 +54,11 @@ class ReflectionClassHandler implements RequestHandlerInterface {
         Action $action,
         ContainerInterface $container
     ) {
-        $this->className = $className;
-        $this->classMethod = $classMethod;
+        $this->className          = $className;
+        $this->classMethod        = $classMethod;
         $this->parameterExtractor = $parameterExtractor;
-        $this->action = $action;
-        $this->container = $container;
+        $this->action             = $action;
+        $this->container          = $container;
     }
 
     /**
@@ -91,7 +91,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
         }
 
         $reflectionClass = new ReflectionClass($class);
-        $arguments = $this->getArguments($request, $reflectionClass);
+        $arguments       = $this->getArguments($request, $reflectionClass);
 
         return $class->{$this->classMethod}(...$arguments);
     }

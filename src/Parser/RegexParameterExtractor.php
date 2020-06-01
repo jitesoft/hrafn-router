@@ -25,9 +25,9 @@ use Psr\Log\LoggerInterface;
  */
 class RegexParameterExtractor implements ParameterExtractorInterface {
     private LoggerInterface $logger;
-    private string          $delimiter;
-    private string          $optionalPattern;
-    private string          $requiredPattern;
+    private string $delimiter;
+    private string $optionalPattern;
+    private string $requiredPattern;
 
     /**
      * RegexParameterExtractor constructor.
@@ -35,8 +35,8 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger = $logger;
-        $this->delimiter = '~';
+        $this->logger          = $logger;
+        $this->delimiter       = '~';
         $this->optionalPattern = '\{\?(\w+)\}';
         $this->requiredPattern = '\{(\w+?)\}';
     }
@@ -115,12 +115,12 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             ]
         );
         // Remove the trailing slash from the path if there is one.
-        $path = trim($path, '/');
+        $path    = trim($path, '/');
         $pattern = trim($pattern, '/');
 
         // To fetch the url parameters with regex, we have to replace each placeholder and optional placeholder
         // with a regular expression string. And, of course, we use regex for that too!
-        $format = '%s%s%s';
+        $format  = '%s%s%s';
         $replace = [
             sprintf(
                 $format,
@@ -136,7 +136,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             ),
             sprintf($format, $this->delimiter, '([/])', $this->delimiter)
         ];
-        $with = [
+        $with    = [
             "(?'$1'\w+)",      // Named capturing group for placeholder.
             "(?:(?'$1'\w+))?", // Named group (inside none-capturing) for optional placeholders.
             '\/'               // Slash should be escaped too!
