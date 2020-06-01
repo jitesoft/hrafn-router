@@ -7,6 +7,7 @@
 
 namespace Hrafn\Router\Tests;
 
+use GuzzleHttp\Psr7\Response;
 use Hrafn\Router\Action;
 use Hrafn\Router\Method;
 use Hrafn\Router\Middleware\AnonymousMiddleware;
@@ -75,6 +76,6 @@ class ActionTest extends TestCase {
 
 class ActionTestTestMiddleware implements MiddlewareInterface {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
-        return null;
+        return new Response();
     }
 }

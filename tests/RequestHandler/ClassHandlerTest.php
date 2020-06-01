@@ -30,7 +30,7 @@ class ClassHandlerTest extends TestCase {
     private $logger;
     private $container;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         ClassHandlerTest_Handler::reset();

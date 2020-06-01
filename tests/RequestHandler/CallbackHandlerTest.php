@@ -27,7 +27,7 @@ class CallbackHandlerTest extends TestCase {
 
     private $nullLogger;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->nullLogger = new NullLogger();

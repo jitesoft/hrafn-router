@@ -20,8 +20,7 @@ This project makes use and implements the following PSR standards:
  * PSR11 Container
  * PSR15 Handlers
 
-Most interfaces are swap-able by using a container implementation of choice. If no container is defined
-a container using the `jitesoft/container` and the implementations in the project are used.
+Most interfaces are swap-able by using a container implementation of choice. If no container is defined a container using a `SimpleMap` structure will be used.
 
 Feel free to read the API documentation for more information about what Interfaces you can use to customize the project to your own liking.
 

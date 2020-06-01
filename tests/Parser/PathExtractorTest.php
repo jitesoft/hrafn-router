@@ -20,7 +20,7 @@ class PathExtractorTest extends TestCase {
     /** @var PathExtractorInterface */
     private $extractor;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->extractor = new RegexPathExtractor(new NullLogger());

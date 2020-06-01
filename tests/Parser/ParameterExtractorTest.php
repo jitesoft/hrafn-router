@@ -22,7 +22,7 @@ class ParameterExtractorTest extends TestCase {
     /** @var ParameterExtractorInterface */
     private $extractor;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->extractor = new RegexParameterExtractor(new NullLogger());
