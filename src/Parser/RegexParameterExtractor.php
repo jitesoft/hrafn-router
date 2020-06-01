@@ -77,9 +77,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         if ($count > 0) {
             if ($optional) {
                 return array_map(
-                    function ($value) {
-                        return str_replace('?', '', $value);
-                    },
+                    static fn ($value) => str_replace('?', '', $value),
                     $matches[1]
                 );
             }

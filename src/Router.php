@@ -67,7 +67,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      *
      * @var array|string[]
      */
-    public static $disabledMiddleware = [];
+    public static array $disabledMiddleware = [];
 
     /**
      * Mark middleware as enabled.
