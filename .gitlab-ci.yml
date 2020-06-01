@@ -1,5 +1,5 @@
 variables:
-  PHP_COMMON_SNIFF_FILE: ruleset.xml
+  PHP_COMMON_SNIFF_FILE: phpcs.xml
 
 include:
   - file: /php/auto.yml
