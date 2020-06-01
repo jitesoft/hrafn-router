@@ -1,9 +1,6 @@
-stages:
-  - test
+variables:
+  PHP_COMMON_SNIFF_FILE: ruleset.xml
 
-test:
-  image: jitesoft/phpunit:7.2-7
-  script:
-    - composer install --no-interaction --prefer-dist
-    - vendor/bin/phpcs -p --report=summary --standard=phpcs.xml src
-    - phpunit --configuration phpunit.xml --coverage-text --colors=never
+include:
+  - file: /php/auto.yml
+    project: jitesoft/gitlab-ci-lib
