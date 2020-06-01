@@ -13,22 +13,21 @@ use Psr\Log\LoggerInterface;
 
 /**
  * RouteTreeManager
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class RouteTreeManager implements LoggerAwareInterface {
-
-    /** @var SimpleMap */
-    private $rootNodes;
-    /** @var LoggerInterface */
-    private $logger;
+    private SimpleMap       $rootNodes;
+    private LoggerInterface $logger;
 
     /**
      * RouteTreeManager constructor.
+     *
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger    = $logger;
+        $this->logger = $logger;
         $this->rootNodes = new SimpleMap();
     }
 
@@ -100,7 +99,7 @@ class RouteTreeManager implements LoggerAwareInterface {
      * @return void
      * @codeCoverageIgnore
      */
-    public function setLogger(LoggerInterface $logger) {
+    public function setLogger(LoggerInterface $logger): void {
         $this->logger = $logger;
     }
 

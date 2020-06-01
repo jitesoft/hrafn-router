@@ -21,6 +21,7 @@ use Hrafn\Router\ {
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
+use Jitesoft\Exceptions\Logic\InvalidKeyException;
 use Jitesoft\Utilities\DataStructures\Maps\ {
     MapInterface,
     SimpleMap
@@ -36,7 +37,8 @@ use Psr\Http\{Message\RequestInterface,
     Message\ResponseInterface,
     Message\ServerRequestInterface,
     Server\MiddlewareInterface,
-    Server\RequestHandlerInterface};
+    Server\RequestHandlerInterface
+};
 
 /**
  * Router
@@ -45,24 +47,17 @@ use Psr\Http\{Message\RequestInterface,
  * @version 1.0.0
  */
 class Router implements LoggerAwareInterface, RequestHandlerInterface {
-    /** @var string */
     public const LOG_TAG = 'Hrafn\Router:';
-    /** @var LoggerInterface */
-    private $logger;
+
     /** @var MapInterface|ContainerInterface */
-    private $container;
-    /** @var RouteBuilderInterface  */
-    private $routeBuilder;
-    /** @var SimpleMap */
-    private $actions;
-    /** @var RouteTreeManager */
-    private $routeTreeManager;
-    /** @var PathExtractorInterface */
-    private $pathExtractor;
-    /**@var ParameterExtractorInterface*/
-    private $paramExtractor;
-    /** @var Node */
-    private $rootNode;
+    private                             $container;
+    private LoggerInterface             $logger;
+    private RouteBuilderInterface       $routeBuilder;
+    private SimpleMap                   $actions;
+    private RouteTreeManager            $routeTreeManager;
+    private PathExtractorInterface      $pathExtractor;
+    private ParameterExtractorInterface $paramExtractor;
+    private Node                        $rootNode;
 
     /**
      * Middlewares marked as disabled.
@@ -83,11 +78,10 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     public static function enableMiddleware(string ...$middleware): void {
         self::$disabledMiddleware = array_filter(
             self::$disabledMiddleware,
-            function(string $m) use($middleware) {
-                return !in_array($m, $middleware);
+            static function (string $m) use ($middleware) {
+                return !in_array($m, $middleware, true);
             }
         );
-        echo count(self::$disabledMiddleware);
     }
 
     /**
@@ -102,12 +96,13 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
     /**
      * Router constructor.
+     *
      * @param ContainerInterface|null $container Dependency container.
      */
     public function __construct(?ContainerInterface $container = null) {
         $this->container = $container ?? new SimpleMap();
 
-        $get = function($name, $default) {
+        $get = function ($name, $default) {
             if (!$this->container->has($name)) {
                 $this->container->set($name, $default);
             }
@@ -130,9 +125,9 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         );
 
         $this->routeTreeManager = new RouteTreeManager($this->logger);
-        $this->actions          = new SimpleMap();
-        $this->rootNode         = new Node(null, '');
-        $this->routeBuilder     = new RouteBuilder(
+        $this->actions = new SimpleMap();
+        $this->rootNode = new Node(null, '');
+        $this->routeBuilder = new RouteBuilder(
             [],
             $this->rootNode,
             $this->pathExtractor,
@@ -162,7 +157,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * @return RouteBuilderInterface
      */
-    public function getBuilder () {
+    public function getBuilder() {
         return $this->routeBuilder;
     }
 
@@ -174,6 +169,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * @throws HttpMethodNotAllowedException On invalid http method.
      * @throws HttpNotFoundException         On invalid path.
      * @throws InvalidArgumentException      On invalid argument.
+     * @throws InvalidKeyException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         $dispatcher = null;
@@ -190,7 +186,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
 
         $this->logger->debug(
             '{tag} Created dispatcher, calling dispatch with supplied request.',
-            [ 'tag' => self::LOG_TAG ]
+            ['tag' => self::LOG_TAG]
         );
 
         return $dispatcher->dispatch(

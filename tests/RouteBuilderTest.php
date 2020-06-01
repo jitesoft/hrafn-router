@@ -6,6 +6,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Tests;
 
+use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\Method;
 use Hrafn\Router\Parser\RegexParameterExtractor;
 use Hrafn\Router\Parser\RegexPathExtractor;
@@ -19,17 +20,17 @@ use ReflectionClass;
 
 /**
  * RouteBuilderTest
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class RouteBuilderTest extends TestCase {
-
-    private $routeBuilder;
+    private RouteBuilderInterface $routeBuilder;
 
     protected function setUp(): void {
         parent::setUp();
 
-        $nullLogger         = new NullLogger();
+        $nullLogger = new NullLogger();
         $this->routeBuilder = new RouteBuilder(
             [],
             new Node(null, '/'),
@@ -52,8 +53,9 @@ class RouteBuilderTest extends TestCase {
     }
 
     public function testGroup() {
-        $this->routeBuilder->group('test', function(RouteBuilder $builder) {
-           $builder->get('abc', function() {});
+        $this->routeBuilder->group('test', function (RouteBuilder $builder) {
+            $builder->get('abc', function () {
+            });
         }, []);
 
         $container = $this->getPrivateValue($this->routeBuilder, 'actionContainer');
@@ -68,8 +70,9 @@ class RouteBuilderTest extends TestCase {
     }
 
     public function testNamespace() {
-        $this->routeBuilder->namespace('/test', function(RouteBuilder $builder) {
-            $builder->get('/abc', function() {});
+        $this->routeBuilder->namespace('/test', function (RouteBuilder $builder) {
+            $builder->get('/abc', function () {
+            });
         }, []);
 
         $container = $this->getPrivateValue($this->routeBuilder, 'actionContainer');
@@ -86,9 +89,10 @@ class RouteBuilderTest extends TestCase {
     public function testActions() {
 
         foreach (Method::getConstantValues() as $method) {
-            $this->routeBuilder->{$method}('/abc', function () {});
+            $this->routeBuilder->{$method}('/abc', function () {
+            });
             $container = $this->getPrivateValue($this->routeBuilder, 'actionContainer');
-            $this->assertTrue($container->has($method.'::/abc'));
+            $this->assertTrue($container->has($method . '::/abc'));
         }
     }
 

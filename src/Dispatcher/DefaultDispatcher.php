@@ -14,6 +14,7 @@ use Hrafn\Router\Router;
 use Hrafn\Router\RouteTree\Node;
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
+use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -23,36 +24,37 @@ use Psr\Log\NullLogger;
 
 /**
  * DefaultDispatcher
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
-    /** @var PathExtractorInterface|RegexPathExtractor|null */
-    private $pathExtractor = null;
-    /** @var LoggerInterface|NullLogger|null */
-    private $logger = null;
-    /** @var Node|null */
-    private $root = null;
-    /** @var MapInterface|null */
-    private $actions = null;
+
+    private ?PathExtractorInterface $pathExtractor = null;
+    private ?LoggerInterface        $logger        = null;
+    private ?Node                   $root          = null;
+    private ?MapInterface           $actions       = null;
 
     /**
      * DefaultDispatcher constructor.
+     *
      * @param Node                        $rootNode      Initial node to traverse from.
      * @param MapInterface                $actions       Actions map.
      * @param PathExtractorInterface|null $pathExtractor Extractor for paths.
      * @param null|LoggerInterface        $logger        Logger to use.
      */
-    public function __construct(Node $rootNode,
-                                MapInterface $actions,
-                                ?PathExtractorInterface $pathExtractor = null,
-                                ?LoggerInterface $logger = null) {
-        $this->logger        = $logger ?? new NullLogger();
-        $this->root          = $rootNode;
-        $this->actions       = $actions;
+    public function __construct(
+        Node $rootNode,
+        MapInterface $actions,
+        ?PathExtractorInterface $pathExtractor = null,
+        ?LoggerInterface $logger = null
+    ) {
+        $this->logger = $logger ?? new NullLogger();
+        $this->root = $rootNode;
+        $this->actions = $actions;
         $this->pathExtractor = $pathExtractor ?? new RegexPathExtractor(
-            $this->logger
-        );
+                $this->logger
+            );
     }
 
     /**
@@ -62,12 +64,10 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
      * @throws HttpNotFoundException On path not found.
      */
     private function getNode(Node $parent, QueueInterface $parts): Node {
-        if (!$parent->hasChild($parts->peek())
-            && !$parent->hasChild('%PARAM%')
-        ) {
+        if (!$parent->hasChild('%PARAM%') && !$parent->hasChild($parts->peek())) {
             $this->logger->error(
                 '{tag} Tried to fetch a resource that did not exist.',
-                [ 'tag' => Router::LOG_TAG ]
+                ['tag' => Router::LOG_TAG]
             );
 
             throw new HttpNotFoundException(
@@ -76,6 +76,7 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
         }
 
         $node = $parent->getChild($parts->dequeue());
+        /** @noinspection NullPointerExceptionInspection */
         return ($parts->count() === 0) ? $node : $this->getNode(
             $node,
             $parts
@@ -89,10 +90,14 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
      * @throws HttpNotFoundException         On path not found.
      * @throws HttpMethodNotAllowedException On method not existing.
      */
-    public function dispatch(string $method,
-                             string $target): RequestHandlerInterface {
-        $parts     = $this->pathExtractor->getUriParts($target);
-        $node      = $this->getNode($this->root, $parts);
+    public function dispatch(
+        string $method,
+        string $target
+    ): RequestHandlerInterface {
+        // The following exception is deprecated in the base class and should not be able to be thrown.
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $parts = $this->pathExtractor->getUriParts($target);
+        $node = $this->getNode($this->root, $parts);
         $reference = $node->getReference(mb_strtolower($method));
 
         if (!$reference) {
@@ -105,7 +110,7 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
 
         $this->logger->debug(
             '{tag} Handler found with default dispatcher.',
-            [ 'tag' => Router::LOG_TAG ]
+            ['tag' => Router::LOG_TAG]
         );
         return $this->actions[$reference]->getHandler();
     }
@@ -117,7 +122,7 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
      * @return void
      * @codeCoverageIgnore
      */
-    public function setLogger(LoggerInterface $logger) {
+    public function setLogger(LoggerInterface $logger): void {
         $this->logger = $logger;
     }
 

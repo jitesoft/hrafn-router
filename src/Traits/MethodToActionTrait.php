@@ -31,7 +31,7 @@ trait MethodToActionTrait {
      * @param array           $middleWares Middlewares to use for the action.
      * @return RouteBuilderInterface
      */
-    protected abstract function action(string $method,
+    abstract protected function action(string $method,
                                        string $pattern,
                                        $handler,
                                        array $middleWares = []

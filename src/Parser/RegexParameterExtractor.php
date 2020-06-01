@@ -16,29 +16,27 @@ use Psr\Log\LoggerInterface;
 
 /**
  * RegexParameterExtractor
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  *
  * Class used to extract parameters from a path by using regular expressions.
  *
  */
 class RegexParameterExtractor implements ParameterExtractorInterface {
-    /** @var LoggerInterface */
-    private $logger;
-    /** @var string  */
-    private $delimiter;
-    /** @var string  */
-    private $optionalPattern;
-    /** @var string */
-    private $requiredPattern;
+    private LoggerInterface $logger;
+    private string          $delimiter;
+    private string          $optionalPattern;
+    private string          $requiredPattern;
 
     /**
      * RegexParameterExtractor constructor.
+     *
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger          = $logger;
-        $this->delimiter       = '~';
+        $this->logger = $logger;
+        $this->delimiter = '~';
         $this->optionalPattern = '\{\?(\w+)\}';
         $this->requiredPattern = '\{(\w+?)\}';
     }
@@ -50,7 +48,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * @return void
      * @codeCoverageIgnore
      */
-    public function setLogger(LoggerInterface $logger) {
+    public function setLogger(LoggerInterface $logger): void {
         $this->logger = $logger;
     }
 
@@ -59,14 +57,16 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * @param boolean $optional If the parameter is optional or not.
      * @return array
      */
-    private function getParameterNames(string $pattern,
-                                       bool $optional = false): array {
+    private function getParameterNames(
+        string $pattern,
+        bool $optional = false
+    ): array {
         $count = preg_match_all(
             sprintf(
                 '%s%s%s',
                 $this->delimiter,
                 (
-                    $optional ? $this->optionalPattern : $this->requiredPattern
+                $optional ? $this->optionalPattern : $this->requiredPattern
                 ),
                 $this->delimiter
             ),
@@ -77,7 +77,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         if ($count > 0) {
             if ($optional) {
                 return array_map(
-                    function($value) {
+                    function ($value) {
                         return str_replace('?', '', $value);
                     },
                     $matches[1]
@@ -105,20 +105,22 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * @return MapInterface
      * @throws InvalidArgumentException On invalid argument.
      */
-    public function getUriParameters(string $pattern,
-                                     string $path): MapInterface {
+    public function getUriParameters(
+        string $pattern,
+        string $path
+    ): MapInterface {
         $this->logger->debug(
             '{tag} Fetching parameters from given path.', [
                 'tag' => Router::LOG_TAG
             ]
         );
         // Remove the trailing slash from the path if there is one.
-        $path    = trim($path, '/');
+        $path = trim($path, '/');
         $pattern = trim($pattern, '/');
 
         // To fetch the url parameters with regex, we have to replace each placeholder and optional placeholder
         // with a regular expression string. And, of course, we use regex for that too!
-        $format  = '%s%s%s';
+        $format = '%s%s%s';
         $replace = [
             sprintf(
                 $format,
@@ -134,7 +136,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             ),
             sprintf($format, $this->delimiter, '([/])', $this->delimiter)
         ];
-        $with    = [
+        $with = [
             "(?'$1'\w+)",      // Named capturing group for placeholder.
             "(?:(?'$1'\w+))?", // Named group (inside none-capturing) for optional placeholders.
             '\/'               // Slash should be escaped too!

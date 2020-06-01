@@ -17,8 +17,7 @@ use Psr\Log\NullLogger;
  * @version 1.0.0
  */
 class PathExtractorTest extends TestCase {
-    /** @var PathExtractorInterface */
-    private $extractor;
+    private PathExtractorInterface $extractor;
 
     protected function setUp(): void {
         parent::setUp();

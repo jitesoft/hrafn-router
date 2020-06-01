@@ -6,14 +6,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\RequestHandler;
 
+use Closure;
 use Hrafn\Router\Action;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
-use Hrafn\Router\Router;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionException;
 use ReflectionFunction;
@@ -21,30 +20,31 @@ use ReflectionFunction;
 /**
  * ReflectionCallbackHandler
  *
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class ReflectionCallbackHandler implements RequestHandlerInterface {
     use HandleMiddlewareTrait;
-    /** @var callable */
-    private $callback;
-    /** @var ParameterExtractorInterface */
-    private $parameterExtractor;
-    /** @var Action */
-    private $action;
+
+    private Closure                     $callback;
+    private ParameterExtractorInterface $parameterExtractor;
+    private Action                      $action;
 
     /**
      * ReflectionCallbackHandler constructor.
+     *
      * @param callable                    $callback           Callback to handle.
      * @param ParameterExtractorInterface $parameterExtractor Extractor for the path parameters.
      * @param Action                      $action             Action object.
      */
-    public function __construct(callable $callback,
-                                ParameterExtractorInterface $parameterExtractor,
-                                Action $action) {
-        $this->callback           = $callback;
+    public function __construct(
+        callable $callback,
+        ParameterExtractorInterface $parameterExtractor,
+        Action $action
+    ) {
+        $this->callback = $callback;
         $this->parameterExtractor = $parameterExtractor;
-        $this->action             = $action;
+        $this->action = $action;
     }
 
     /**
@@ -60,7 +60,7 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
             return $this->process($request);
         }
 
-        $reflect    = new ReflectionFunction($this->callback);
+        $reflect = new ReflectionFunction($this->callback);
         $parameters = $reflect->getParameters();
 
         $arguments = [];
@@ -82,32 +82,34 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
             $name = mb_strtolower($parameter->getName());
             if ($parsedParams->has($name)) {
                 $arguments[] = $parsedParams[$name];
-            } else if ($parameter->isOptional()) {
-                $arguments[] = null;
             } else {
-                // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
-                // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
-                $class = null;
-                try {
-                    $class = $parameter->getClass();
-                    if ($class
-                        && $class->implementsInterface(RequestInterface::class)
-                    ) {
-                        $arguments[] = $request;
+                if ($parameter->isOptional()) {
+                    $arguments[] = null;
+                } else {
+                    // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
+                    // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
+                    $class = null;
+                    try {
+                        $class = $parameter->getClass();
+                        if ($class
+                            && $class->implementsInterface(RequestInterface::class)
+                        ) {
+                            $arguments[] = $request;
+                            continue;
+                        }
+                    } catch (ReflectionException $ex) {
+                        // Do nothing.
                         continue;
                     }
-                } catch (ReflectionException $ex) {
-                    // Do nothing.
-                    continue;
+                    // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
+                    // not exist.
+                    throw new HttpBadRequestException(
+                        sprintf(
+                            'Parameter in handler does not exist in pattern (%s).',
+                            $parameter->getName()
+                        )
+                    );
                 }
-                // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
-                // not exist.
-                throw new HttpBadRequestException(
-                    sprintf(
-                        'Parameter in handler does not exist in pattern (%s).',
-                        $parameter->getName()
-                    )
-                );
             }
         }
 

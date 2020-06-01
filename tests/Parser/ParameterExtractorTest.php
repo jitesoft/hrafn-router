@@ -18,9 +18,7 @@ use Psr\Log\NullLogger;
  * @version 1.0.0
  */
 class ParameterExtractorTest extends TestCase {
-
-    /** @var ParameterExtractorInterface */
-    private $extractor;
+    private ParameterExtractorInterface $extractor;
 
     protected function setUp(): void {
         parent::setUp();

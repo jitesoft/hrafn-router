@@ -7,6 +7,7 @@
 
 namespace Hrafn\Router\Middleware;
 
+use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -18,9 +19,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @version 1.0.0
  */
 class AnonymousMiddleware implements MiddlewareInterface {
-
-    /** @var callable */
-    private $handler;
+    private Closure $handler;
 
     /**
      * AnonymousMiddleware constructor.

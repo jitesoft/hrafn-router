@@ -13,35 +13,29 @@ use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
 
 /**
  * RouteNode
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  * @internal
- * @state Unstable
+ * @state   Unstable
  */
 class Node {
-
-    /** @var Node */
-    private $parent;
-
-    /** @var MapInterface */
-    private $children;
-
-    /** @var string */
-    private $part;
-
-    /** @var string|null */
-    private $references;
+    private ?Node        $parent;
+    private MapInterface $children;
+    private MapInterface $references;
+    private string       $part;
 
     /**
      * RouteNode constructor.
+     *
      * @param Node|null $parent Parent node.
      * @param string    $part   Part of path this node uses.
      * @internal
      */
     public function __construct(?Node $parent, string $part) {
-        $this->part       = $part;
-        $this->parent     = $parent;
-        $this->children   = new SimpleMap();
+        $this->part = $part;
+        $this->parent = $parent;
+        $this->children = new SimpleMap();
         $this->references = new SimpleMap();
     }
 
@@ -58,7 +52,7 @@ class Node {
      * @param string $part Part of path to check for.
      * @return boolean
      */
-    public function hasChild(string $part) {
+    public function hasChild(string $part): bool {
         return $this->children->has($part);
     }
 

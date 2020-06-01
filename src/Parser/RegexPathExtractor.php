@@ -8,6 +8,7 @@ namespace Hrafn\Router\Parser;
 
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Router;
+use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Log\LoggerInterface;
@@ -15,29 +16,26 @@ use Psr\Log\LoggerInterface;
 /**
  * RegexPathExtractor
  *
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  *
  * Class used to extract parts from a path using regular expressions.
  *
  */
 class RegexPathExtractor implements PathExtractorInterface {
-    /** @var LoggerInterface */
-    private $logger;
-    /** @var string */
-    private $delimiter;
-    /** @var string  */
-    private $optionalPattern;
-    /** @var string */
-    private $requiredPattern;
+    private LoggerInterface $logger;
+    private string          $delimiter;
+    private string          $optionalPattern;
+    private string          $requiredPattern;
 
     /**
      * RegexPathExtractor constructor.
+     *
      * @param LoggerInterface $logger Logger to use.
      */
     public function __construct(LoggerInterface $logger) {
-        $this->logger          = $logger;
-        $this->delimiter       = '~';
+        $this->logger = $logger;
+        $this->delimiter = '~';
         $this->optionalPattern = '\{\?(\w+)\}';
         $this->requiredPattern = '\{(\w+?)\}';
     }
@@ -49,7 +47,7 @@ class RegexPathExtractor implements PathExtractorInterface {
      * @return void
      * @codeCoverageIgnore
      */
-    public function setLogger(LoggerInterface $logger) {
+    public function setLogger(LoggerInterface $logger): void {
         $this->logger = $logger;
     }
 
@@ -59,6 +57,7 @@ class RegexPathExtractor implements PathExtractorInterface {
      *
      * @param string $path Path to extract uri parts from.
      * @return QueueInterface
+     * @throws InvalidArgumentException
      */
     public function getUriParts(string $path): QueueInterface {
         $this->logger->debug(
@@ -68,7 +67,7 @@ class RegexPathExtractor implements PathExtractorInterface {
                 'path' => $path
             ]
         );
-        $format  = '%s%s%s';
+        $format = '%s%s%s';
         $replace = [
             sprintf(
                 $format,
@@ -88,7 +87,7 @@ class RegexPathExtractor implements PathExtractorInterface {
         $list = explode('/', $path);
         $this->logger->debug(
             '{tag} Extracted {count} parts from the path.', [
-                'tag' => Router::LOG_TAG,
+                'tag'   => Router::LOG_TAG,
                 'count' => count($list)
             ]
         );
@@ -96,7 +95,7 @@ class RegexPathExtractor implements PathExtractorInterface {
         if (empty($path) || $path === '/') {
             $this->logger->debug(
                 '{tag} Path was empty or root.',
-                [ 'tag' => Router::LOG_TAG ]
+                ['tag' => Router::LOG_TAG]
             );
             $list = [''];
         } else {

@@ -12,6 +12,7 @@ use Hrafn\Router\Router;
 use Jitesoft\Container\Injector;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
+use Jitesoft\Exceptions\Psr\Container\ContainerException;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface as Request;
@@ -24,40 +25,40 @@ use ReflectionException;
 
 /**
  * ReflectionClassHandler
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class ReflectionClassHandler implements RequestHandlerInterface {
     use HandleMiddlewareTrait;
-    /** @var string */
-    private $className;
-    /** @var string */
-    private $classMethod;
-    /** @var ParameterExtractorInterface */
-    private $parameterExtractor;
-    /** @var Action */
-    private $action;
-    /** @var ContainerInterface */
-    private $container;
+
+    private string                      $className;
+    private string                      $classMethod;
+    private ParameterExtractorInterface $parameterExtractor;
+    private Action                      $action;
+    private ContainerInterface          $container;
 
     /**
      * ReflectionClassHandler constructor.
+     *
      * @param string                      $className          Name of the class.
      * @param string                      $classMethod        Name of the method.
      * @param ParameterExtractorInterface $parameterExtractor Parameter extractor object.
      * @param Action                      $action             Action object.
      * @param ContainerInterface          $container          Container.
      */
-    public function __construct(string $className,
-                                string $classMethod,
-                                ParameterExtractorInterface $parameterExtractor,
-                                Action $action,
-                                ContainerInterface $container) {
-        $this->className          = $className;
-        $this->classMethod        = $classMethod;
+    public function __construct(
+        string $className,
+        string $classMethod,
+        ParameterExtractorInterface $parameterExtractor,
+        Action $action,
+        ContainerInterface $container
+    ) {
+        $this->className = $className;
+        $this->classMethod = $classMethod;
         $this->parameterExtractor = $parameterExtractor;
-        $this->action             = $action;
-        $this->container          = $container;
+        $this->action = $action;
+        $this->container = $container;
     }
 
     /**
@@ -68,6 +69,8 @@ class ReflectionClassHandler implements RequestHandlerInterface {
      * @throws HttpBadRequestException          On bad request.
      * @throws HttpInternalServerErrorException On severe error.
      * @throws ReflectionException              On reflection error.
+     * @throws HttpInternalServerErrorException On missing handler.
+     * @throws ContainerException               On container failure.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
         if ($this->action->getMiddlewares()->count() !== 0) {
@@ -88,7 +91,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
         }
 
         $reflectionClass = new ReflectionClass($class);
-        $arguments       = $this->getArguments($request, $reflectionClass);
+        $arguments = $this->getArguments($request, $reflectionClass);
 
         return $class->{$this->classMethod}(...$arguments);
     }
@@ -100,8 +103,10 @@ class ReflectionClassHandler implements RequestHandlerInterface {
      * @throws HttpBadRequestException          On bad request.
      * @throws ReflectionException              On errors in reflection.
      */
-    private function getArguments(RequestInterface $request,
-                                  ReflectionClass $class): array {
+    private function getArguments(
+        RequestInterface $request,
+        ReflectionClass $class
+    ): array {
         $reflectionMethod = $class->getMethod($this->classMethod);
 
         if ($reflectionMethod->getNumberOfParameters() === 0) {
@@ -123,30 +128,32 @@ class ReflectionClassHandler implements RequestHandlerInterface {
             $name = mb_strtolower($parameter->getName());
             if ($parsedParams->has($name)) {
                 $arguments[] = $parsedParams[$name];
-            } else if ($parameter->isOptional()) {
-                $arguments[] = null;
             } else {
-                // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
-                // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
-                $c = null;
-                try {
-                    $c = $parameter->getClass();
-                    if ($c && $c->implementsInterface(Request::class)) {
-                        $arguments[] = $request;
+                if ($parameter->isOptional()) {
+                    $arguments[] = null;
+                } else {
+                    // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
+                    // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
+                    $c = null;
+                    try {
+                        $c = $parameter->getClass();
+                        if ($c && $c->implementsInterface(Request::class)) {
+                            $arguments[] = $request;
+                            continue;
+                        }
+                    } catch (ReflectionException $ex) {
+                        // Do nothing, this is okay.
                         continue;
                     }
-                } catch (ReflectionException $ex) {
-                    // Do nothing, this is okay.
-                    continue;
+                    // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
+                    // not exist.
+                    throw new HttpBadRequestException(
+                        sprintf(
+                            'Parameter in handler does not exist in pattern (%s).',
+                            $parameter->getName()
+                        )
+                    );
                 }
-                // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
-                // not exist.
-                throw new HttpBadRequestException(
-                    sprintf(
-                        'Parameter in handler does not exist in pattern (%s).',
-                        $parameter->getName()
-                    )
-                );
             }
         }
         return $arguments;

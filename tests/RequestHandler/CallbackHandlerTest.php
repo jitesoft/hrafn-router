@@ -24,8 +24,7 @@ use Psr\Log\NullLogger;
  * @version 1.0.0
  */
 class CallbackHandlerTest extends TestCase {
-
-    private $nullLogger;
+    private NullLogger $nullLogger;
 
     protected function setUp(): void {
         parent::setUp();

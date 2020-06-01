@@ -24,23 +24,21 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Action
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class Action implements ActionInterface {
     private const HANDLER_SEPARATOR = '@';
 
-    /** @var string|null */
-    private $method = null;
-    /** @var ReflectionClassHandler|null */
-    private $handler = null;
-    /** @var string|null */
-    private $pattern = null;
-    /** @var LinkedQueue|null */
-    private $middlewares = null;
+    private string                  $method;
+    private RequestHandlerInterface $handler;
+    private string                  $pattern;
+    private LinkedQueue             $middlewares;
 
     /**
      * Action constructor.
+     *
      * @param string                          $method             Method of the given action.
      * @param string|callable                 $handler            Action callback handler.
      * @param string                          $pattern            Pattern the action uses.
@@ -50,13 +48,15 @@ class Action implements ActionInterface {
      *
      * @internal
      */
-    public function __construct(string $method,
-                                $handler,
-                                string $pattern,
-                                array $middlewares,
-                                ParameterExtractorInterface $parameterExtractor,
-                                $container = null) {
-        $this->method  = $method;
+    public function __construct(
+        string $method,
+        $handler,
+        string $pattern,
+        array $middlewares,
+        ParameterExtractorInterface $parameterExtractor,
+        $container = null
+    ) {
+        $this->method = $method;
         $this->pattern = $pattern;
 
         if (is_callable($handler)) {
@@ -82,10 +82,11 @@ class Action implements ActionInterface {
 
         $middlewares = Arrays::map(
             $middlewares,
-            function ($middleware) use($container) {
+            function ($middleware) use ($container) {
                 if (is_callable($middleware)) {
                     return new AnonymousMiddleware($middleware);
-                } if (is_string($middleware)
+                }
+                if (is_string($middleware)
                     && $container
                     && $container->has($middleware)
                 ) {
@@ -115,8 +116,8 @@ class Action implements ActionInterface {
     /**
      * Get the request method, the method string will correspond to the Hrafn\Router\Method constants.
      *
-     * @see Method
      * @return string
+     * @see Method
      */
     public function getMethod(): string {
         return $this->method;

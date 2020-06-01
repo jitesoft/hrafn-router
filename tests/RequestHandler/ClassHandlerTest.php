@@ -17,18 +17,19 @@ use Jitesoft\Container\Container;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\NullLogger;
 
 /**
  * ClassHandlerTest
- * @author Johannes Tegnér <johannes@jitesoft.com>
+ *
+ * @author  Johannes Tegnér <johannes@jitesoft.com>
  * @version 1.0.0
  */
 class ClassHandlerTest extends TestCase {
-
-    private $logger;
-    private $container;
+    private NullLogger         $logger;
+    private ContainerInterface $container;
 
     protected function setUp(): void {
         parent::setUp();
@@ -63,7 +64,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleOneParam() {
         $callee = ClassHandlerTest_Handler::class . '@handlerWithOneParam';
 
-        $action = new Action('get', $callee, '/test/{id}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{id}', [], new RegexParameterExtractor($this->logger),
+            $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handlerWithOneParam',
@@ -82,7 +84,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleMultipleRequiredParams() {
         $callee = ClassHandlerTest_Handler::class . '@handleWithMultipleRequiredParams';
 
-        $action = new Action('get', $callee, '/test/{id}/{name}/{something}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{id}/{name}/{something}', [],
+            new RegexParameterExtractor($this->logger), $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handleWithMultipleRequiredParams',
@@ -101,7 +104,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleMultipleOptionalParams() {
         $callee = ClassHandlerTest_Handler::class . '@handleWithMultipleOptionalParams';
 
-        $action = new Action('get', $callee, '/test/{?id}/{?name}/{?something}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{?id}/{?name}/{?something}', [],
+            new RegexParameterExtractor($this->logger), $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handleWithMultipleOptionalParams',
@@ -120,7 +124,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleMultipleMixedParams() {
         $callee = ClassHandlerTest_Handler::class . '@handleWithMixedParams';
 
-        $action = new Action('get', $callee, '/test/{id}/{name}/{?something}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{id}/{name}/{?something}', [],
+            new RegexParameterExtractor($this->logger), $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handleWithMixedParams',
@@ -139,7 +144,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleInvalidArgumentException() {
         $callee = ClassHandlerTest_Handler::class . '@handleInvalidException';
 
-        $action = new Action('get', $callee, '/test/{id}/{name}/{something}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{id}/{name}/{something}', [],
+            new RegexParameterExtractor($this->logger), $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handleInvalidException',
@@ -151,7 +157,6 @@ class ClassHandlerTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $handler->handle(new ServerRequest('get', '/test/123/test'));
 
-
         $this->assertTrue(ClassHandlerTest_Handler::$called);
         $this->assertEquals('abc123', ClassHandlerTest_Handler::$value->value);
     }
@@ -159,7 +164,8 @@ class ClassHandlerTest extends TestCase {
     public function testHandleBadRequestException() {
         $callee = ClassHandlerTest_Handler::class . '@handleBadRequest';
 
-        $action = new Action('get', $callee, '/test/{id}/{name}', [], new RegexParameterExtractor($this->logger), $this->container);
+        $action = new Action('get', $callee, '/test/{id}/{name}', [], new RegexParameterExtractor($this->logger),
+            $this->container);
         $handler = new ReflectionClassHandler(
             ClassHandlerTest_Handler::class,
             'handleBadRequest',
@@ -195,7 +201,7 @@ class ClassHandlerTest_Handler {
 
     public function __construct(ClassHandlerTest_BoundObject $object) {
         self::$called = true;
-        self::$value  = $object;
+        self::$value = $object;
     }
 
     public function handlerWithNoParam() {
@@ -209,7 +215,12 @@ class ClassHandlerTest_Handler {
         return new Response($id);
     }
 
-    public function handleWithMultipleRequiredParams(ServerRequestInterface $request, int $id, string $name, $something) {
+    public function handleWithMultipleRequiredParams(
+        ServerRequestInterface $request,
+        int $id,
+        string $name,
+        $something
+    ) {
         if ($id !== 123 || $name !== 'abc123' || $something !== '123abc') {
             throw new Exception('No!');
         }

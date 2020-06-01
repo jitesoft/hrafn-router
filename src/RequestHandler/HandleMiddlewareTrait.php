@@ -29,8 +29,11 @@ trait HandleMiddlewareTrait {
     public function process(RequestInterface $request) {
         if (count(Router::$disabledMiddleware) > 0) {
             $disabled = in_array(
-                get_class($this->action->getMiddlewares()->peek()),
-                Router::$disabledMiddleware
+                get_class(
+                    $this->action->getMiddlewares()->peek()
+                ),
+                Router::$disabledMiddleware,
+                true
             );
 
             if ($disabled) {

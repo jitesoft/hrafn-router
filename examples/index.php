@@ -2,9 +2,9 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $router = new \Hrafn\Router\Router();
-$router->getBuilder()->group('api', function(\Hrafn\Router\RouteBuilder $builder) {
-   $builder->group('v1', function(\Hrafn\Router\RouteBuilder $builder) {
-      $builder->get('test', function() {
+$router->getBuilder()->group('api', static function(\Hrafn\Router\RouteBuilder $builder) {
+   $builder->group('v1', static function(\Hrafn\Router\RouteBuilder $builder) {
+      $builder->get('test', static function() {
           return new \GuzzleHttp\Psr7\Response(200, [
               'Content-Type' => 'application/json'
           ], json_encode(['did-it-work?' => 'YES IT DID!']));
