@@ -1,5 +1,10 @@
 # Router
 
+![Packagist Version](https://img.shields.io/packagist/v/hrafn/router?style=flat-square)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/hrafn/router?style=flat-square)
+[![coverage report](https://gitlab.com/jitesoft/open-source/php/hrafn/router/badges/master/coverage.svg)](https://gitlab.com/jitesoft/open-source/php/hrafn/router/-/commits/master)
+[![pipeline status](https://gitlab.com/jitesoft/open-source/php/hrafn/router/badges/master/pipeline.svg)](https://gitlab.com/jitesoft/open-source/php/hrafn/router/-/commits/master)
+
 *Observe: This project is still a work in progress. Before version 1.0.0 it should be seen as highly unstable.*
 
 ## What is this?
