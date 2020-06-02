@@ -155,16 +155,21 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         );
 
         // Test the $path.
-        preg_match_all($regEx, $path, $matches, 512);
-        array_change_key_case($matches, 0);
+        preg_match_all(
+            $regEx,
+            $path,
+            $matches,
+            PREG_PATTERN_ORDER | PREG_UNMATCHED_AS_NULL
+        );
+        array_change_key_case($matches ?? [], 0);
         $optionalParameterNames = $this->getParameterNames($pattern, true);
         $requiredParameterNames = $this->getParameterNames($pattern, false);
 
         $outParameters = new SimpleMap();
 
         foreach ($requiredParameterNames as $name) {
-            $name = mb_strtolower($name);
-            if (!array_key_exists($name, $matches)
+            if (!$matches
+                || !array_key_exists($name, $matches)
                 || count($matches[$name]) <= 0
                 || empty($matches[$name][0])
             ) {
