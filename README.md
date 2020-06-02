@@ -1,7 +1,7 @@
 # Router
 
-![Packagist Version](https://img.shields.io/packagist/v/hrafn/router?style=flat-square)
-![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/hrafn/router?style=flat-square)
+![Packagist Version](https://img.shields.io/packagist/v/hrafn/router)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/hrafn/router)
 [![coverage report](https://gitlab.com/jitesoft/open-source/php/hrafn/router/badges/master/coverage.svg)](https://gitlab.com/jitesoft/open-source/php/hrafn/router/-/commits/master)
 [![pipeline status](https://gitlab.com/jitesoft/open-source/php/hrafn/router/badges/master/pipeline.svg)](https://gitlab.com/jitesoft/open-source/php/hrafn/router/-/commits/master)
 
