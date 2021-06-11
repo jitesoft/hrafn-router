@@ -2,7 +2,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   AnonymousMiddlewareTest.php - Part of the router project.
 
-  © - Jitesoft 2018
+  © - Jitesoft 2018-2021
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Tests\Middleware;
 
