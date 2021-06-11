@@ -2,7 +2,7 @@ version: '2'
 services:
 
   apache:
-    image: php:7.3-apache
+    image: php:8-apache
     volumes:
       - ../src/var/www/src
       - ../vendor:/var/www/vendor
