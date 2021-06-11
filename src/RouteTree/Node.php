@@ -7,6 +7,7 @@
 
 namespace Hrafn\Router\RouteTree;
 
+use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Maps\SimpleMap;
@@ -61,14 +62,12 @@ class Node {
      *
      * @param string $method Method to fetch.
      * @return null|string
+     * @throws HttpInternalServerErrorException On .
      */
     public function getReference(string $method): ?string {
         if ($this->references->has($method)) {
-            try {
-                return $this->references->get($method);
-            } catch (InvalidArgumentException $e) {
-                die('This should never happen.');
-            }
+            /** @noinspection PhpUnhandledExceptionInspection */
+            return $this->references->get($method);
         }
         return null;
     }

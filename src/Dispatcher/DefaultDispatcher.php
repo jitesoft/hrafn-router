@@ -6,7 +6,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Dispatcher;
 
-use Hrafn\Router\Contracts\ActionInterface;
 use Hrafn\Router\Contracts\DispatcherInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Parser\RegexPathExtractor;
@@ -14,7 +13,6 @@ use Hrafn\Router\Router;
 use Hrafn\Router\RouteTree\Node;
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
-use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -30,10 +28,10 @@ use Psr\Log\NullLogger;
  */
 class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
 
-    private ?PathExtractorInterface $pathExtractor = null;
-    private ?LoggerInterface $logger               = null;
-    private ?Node $root                            = null;
-    private ?MapInterface $actions                 = null;
+    private PathExtractorInterface $pathExtractor;
+    private LoggerInterface $logger;
+    private Node $root;
+    private MapInterface $actions;
 
     /**
      * DefaultDispatcher constructor.
@@ -76,7 +74,6 @@ class DefaultDispatcher implements DispatcherInterface, LoggerAwareInterface {
         }
 
         $node = $parent->getChild($parts->dequeue());
-        /** @noinspection NullPointerExceptionInspection */
         return ($parts->count() === 0) ? $node : $this->getNode(
             $node,
             $parts

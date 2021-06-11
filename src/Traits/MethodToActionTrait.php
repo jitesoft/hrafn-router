@@ -32,7 +32,7 @@ trait MethodToActionTrait {
      */
     abstract protected function action(string $method,
         string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         ?array $middleWares = []
     ): static;
 
@@ -45,7 +45,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function get(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::GET, $pattern, $handler, $middleWares);
     }
@@ -59,7 +59,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function head(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::HEAD, $pattern, $handler, $middleWares);
     }
@@ -73,7 +73,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function post(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::POST, $pattern, $handler, $middleWares);
     }
@@ -87,7 +87,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function put(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::PUT, $pattern, $handler, $middleWares);
     }
@@ -101,7 +101,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function delete(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::DELETE, $pattern, $handler, $middleWares);
     }
@@ -115,7 +115,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function connect(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::CONNECT, $pattern, $handler, $middleWares);
     }
@@ -129,7 +129,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function options(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::OPTIONS, $pattern, $handler, $middleWares);
     }
@@ -143,7 +143,7 @@ trait MethodToActionTrait {
      * @return static
      */
     public function trace(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::TRACE, $pattern, $handler, $middleWares);
     }
@@ -157,8 +157,9 @@ trait MethodToActionTrait {
      * @return static
      */
     public function patch(string $pattern,
-        string|callable $handler,
+        string | callable $handler,
         array $middleWares = []): static {
         return $this->action(Method::PATCH, $pattern, $handler, $middleWares);
     }
+
 }

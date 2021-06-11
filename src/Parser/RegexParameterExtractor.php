@@ -90,11 +90,11 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
      * Get parameters from a path using a specified pattern.
      * Resulting map will be mapped as:
      *
-     * Each parameter name have been converted to lower for ease of comparision.
+     * Each parameter name have been converted to lower for ease of comparison.
      *
      * <code>
      * [
-     *   parametername => parametervalue, ...
+     *   parameter_name => parameter_value, ...
      * ]
      * </code>
      *
@@ -144,7 +144,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
         // We need to make sure that optional placeholders have an optional slash, to make sure that
         // `/path/optional`, /path/optional/ `/path/` and `/path` will match the regex.
         // Future optimization could use a lookahead to replace it in one pass.
-        $regEx = preg_replace('~\\\/\(\?\:~', '[\/]?(?:', $regEx);
+        $regEx = preg_replace('~\\\/\(\?:~', '[\/]?(?:', $regEx);
         // Put together the full regular expression string before testing.
         // The extra optional slash should be added so that trailing slashes are allowed.
         $regEx = sprintf(
@@ -161,9 +161,10 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             $matches,
             PREG_PATTERN_ORDER | PREG_UNMATCHED_AS_NULL
         );
-        $matches = array_change_key_case($matches ?? [], CASE_LOWER);
+
+        $matches                = array_change_key_case($matches ?? [], CASE_LOWER);
         $optionalParameterNames = $this->getParameterNames($pattern, true);
-        $requiredParameterNames = $this->getParameterNames($pattern, false);
+        $requiredParameterNames = $this->getParameterNames($pattern);
 
         $outParameters = new SimpleMap();
 

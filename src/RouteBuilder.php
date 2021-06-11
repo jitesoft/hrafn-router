@@ -9,11 +9,9 @@ namespace Hrafn\Router;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Contracts\RouteBuilderInterface;
-use Hrafn\Router\Middleware\AnonymousMiddleware;
 use Hrafn\Router\RouteTree\Node;
 use Hrafn\Router\RouteTree\RouteTreeManager;
 use Hrafn\Router\Traits\MethodToActionTrait;
-use Jitesoft\Utilities\DataStructures\Arrays;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -38,8 +36,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     private LoggerInterface $logger;
     private MapInterface $actionContainer;
     private ParameterExtractorInterface $parameterExtractor;
-    /** @var MapInterface|ContainerInterface|null */
-    private                             $container;
+    private ContainerInterface | MapInterface | null $container;
 
     /**
      * RouteBuilder constructor.
@@ -63,7 +60,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         string $basePattern,
         LoggerInterface $logger,
         MapInterface $actionContainer,
-        ContainerInterface|MapInterface|null $container = null
+        ContainerInterface | MapInterface | null $container = null
     ) {
         $this->root               = $node;
         $this->middlewares        = $middlewares;
@@ -117,7 +114,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      */
     protected function action(string $method,
                               string $pattern,
-                              string|callable $handler,
+                              string | callable $handler,
                               ?array $middleWares = []
     ): static {
         $pattern   = $this->cleanupPattern($pattern);
@@ -205,7 +202,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     public function group(
         string $pattern,
         callable $closure,
-        array|null $middleWares = []
+        array | null $middleWares = []
     ): static {
         return $this->namespace($pattern, $closure, $middleWares);
     }

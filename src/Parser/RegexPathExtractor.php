@@ -8,7 +8,6 @@ namespace Hrafn\Router\Parser;
 
 use Hrafn\Router\Contracts\PathExtractorInterface;
 use Hrafn\Router\Router;
-use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
 use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Log\LoggerInterface;

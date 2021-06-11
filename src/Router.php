@@ -21,22 +21,19 @@ use Hrafn\Router\ {
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
-use Jitesoft\Exceptions\Logic\InvalidKeyException;
 use Jitesoft\Utilities\DataStructures\Maps\ {
     MapInterface,
     SimpleMap
 };
-use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\ {
     Container\ContainerInterface,
     Log\LoggerAwareInterface,
     Log\LoggerInterface,
     Log\NullLogger
 };
-use Psr\Http\{Message\RequestInterface,
+use Psr\Http\{
     Message\ResponseInterface,
     Message\ServerRequestInterface,
-    Server\MiddlewareInterface,
     Server\RequestHandlerInterface
 };
 
@@ -49,8 +46,7 @@ use Psr\Http\{Message\RequestInterface,
 class Router implements LoggerAwareInterface, RequestHandlerInterface {
     public const LOG_TAG = 'Hrafn\Router:';
 
-    /** @var MapInterface|ContainerInterface */
-    private                             $container;
+    private ContainerInterface | MapInterface $container;
     private LoggerInterface $logger;
     private RouteBuilderInterface $routeBuilder;
     private SimpleMap $actions;
@@ -106,6 +102,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             if (!$this->container->has($name)) {
                 $this->container->set($name, $default);
             }
+            /** @noinspection PhpUnhandledExceptionInspection */
             return $this->container->get($name);
         };
 
@@ -152,12 +149,13 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         $this->routeBuilder->setLogger($logger);
         $this->routeTreeManager->setLogger($logger);
         $this->pathExtractor->setLogger($logger);
+        $this->paramExtractor->setLogger($logger);
     }
 
     /**
      * @return RouteBuilderInterface
      */
-    public function getBuilder() {
+    public function getBuilder(): RouteBuilderInterface {
         return $this->routeBuilder;
     }
 
@@ -171,18 +169,16 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * @throws InvalidArgumentException      On invalid argument.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface {
-        $dispatcher = null;
-        if ($this->container->has(DispatcherInterface::class)) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $dispatcher = $this->container->get(DispatcherInterface::class);
-        } else {
-            $dispatcher = new DefaultDispatcher(
-                $this->rootNode,
-                $this->actions,
-                $this->pathExtractor,
-                $this->logger
-            );
-        }
+        $dispatcher = $this->container->has(
+            DispatcherInterface::class
+        ) ? $this->container->get(
+            DispatcherInterface::class
+        ) : new DefaultDispatcher(
+            $this->rootNode,
+            $this->actions,
+            $this->pathExtractor,
+            $this->logger
+        );
 
         $this->logger->debug(
             '{tag} Created dispatcher, calling dispatch with supplied request.',

@@ -148,23 +148,23 @@ class MethodToActionTraitTest extends TestCase {
 class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
     use MethodToActionTrait;
     /** @var bool */
-    public $called = false;
+    public bool $called = false;
 
     /** @var array */
-    private $expectation;
+    private array $expectation = [];
 
     /** @var array */
-    private $errors;
+    private array $errors = [];
 
+    /** @noinspection MagicMethodsValidityInspection */
     public function __set($name, $value) {
         $this->expectation[$name] = $value;
     }
 
     protected function action(string $method,
                               string $pattern,
-                              $handler,
-                              $middleWares = []): RouteBuilderInterface {
-        $this->errors = [];
+                              string|callable $handler,
+                              ?array $middleWares = []): static {
         $this->called = true;
 
         foreach (['method' => $method, 'pattern' => $pattern, 'handler' => $handler, 'middlewares' => $middleWares] as $name => $value) {
@@ -188,7 +188,7 @@ class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
         return $this->errors;
     }
 
-    public function namespace(string $pattern, callable $closure,  array $middleWares = []): RouteBuilderInterface { }
+    public function namespace(string $pattern, callable $closure,  ?array $middleWares = []): static { }
 
     /**
      * Create a new group inside of current group.
@@ -197,10 +197,10 @@ class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
      *
      * @param string     $pattern
      * @param callable   $closure
-     * @param array      $middleWares
-     * @return RouteBuilderInterface
+     * @param ?array      $middleWares
+     * @return static
      */
-    public function group(string $pattern, callable $closure, array $middleWares = []): RouteBuilderInterface {
-        $this->namespace($pattern, $closure, $middleWares);
+    public function group(string $pattern, callable $closure, ?array $middleWares = []): static {
+        return $this->namespace($pattern, $closure, $middleWares);
     }
 }

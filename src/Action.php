@@ -14,7 +14,6 @@ use Hrafn\Router\RequestHandler\ReflectionCallbackHandler;
 use Hrafn\Router\RequestHandler\ReflectionClassHandler;
 use function is_callable;
 use Jitesoft\Container\Container;
-use Jitesoft\Exceptions\Psr\Container\ContainerException;
 use Jitesoft\Utilities\DataStructures\Arrays;
 use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Jitesoft\Utilities\DataStructures\Queues\LinkedQueue;
@@ -39,22 +38,22 @@ class Action implements ActionInterface {
     /**
      * Action constructor.
      *
-     * @param string                          $method             Method of the given action.
-     * @param string|callable                 $handler            Action callback handler.
-     * @param string                          $pattern            Pattern the action uses.
-     * @param array                           $middlewares        Middlewares to use.
-     * @param ParameterExtractorInterface     $parameterExtractor Parameter extractor object.
-     * @param ContainerInterface|MapInterface $container          Dependency container.
+     * @param string                               $method             Method of the given action.
+     * @param string|callable                      $handler            Action callback handler.
+     * @param string                               $pattern            Pattern the action uses.
+     * @param array                                $middlewares        Middlewares to use.
+     * @param ParameterExtractorInterface          $parameterExtractor Parameter extractor object.
+     * @param ContainerInterface|MapInterface|null $container          Dependency container.
      *
      * @internal
      */
     public function __construct(
         string $method,
-        $handler,
+        string | callable $handler,
         string $pattern,
         array $middlewares,
         ParameterExtractorInterface $parameterExtractor,
-        $container = null
+        ContainerInterface | MapInterface | null $container = null
     ) {
         $this->method  = $method;
         $this->pattern = $pattern;
@@ -66,8 +65,7 @@ class Action implements ActionInterface {
                 $this
             );
         } else {
-            $handlerSplit = explode(self::HANDLER_SEPARATOR, $handler);
-            try {
+            $handlerSplit      = explode(self::HANDLER_SEPARATOR, $handler);
                 $this->handler = new ReflectionClassHandler(
                     $handlerSplit[0],
                     $handlerSplit[1],
@@ -75,9 +73,7 @@ class Action implements ActionInterface {
                     $this,
                     $container ?? new Container([])
                 );
-            } catch (ContainerException $e) {
-                die('This should never happen as the container is empty...');
-            }
+
         }
 
         $middlewares = Arrays::map(
@@ -87,8 +83,7 @@ class Action implements ActionInterface {
                     return new AnonymousMiddleware($middleware);
                 }
                 if (is_string($middleware)
-                    && $container
-                    && $container->has($middleware)
+                    && $container?->has($middleware)
                 ) {
                     return $container[$middleware];
                 }

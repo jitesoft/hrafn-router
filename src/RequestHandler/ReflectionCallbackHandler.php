@@ -1,6 +1,6 @@
 <?php
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  ReflectionCallbackHandlerackHandler.php - Part of the router project.
+  ReflectionCallbackHandler.php - Part of the router project.
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -84,36 +84,34 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
             $name = mb_strtolower($parameter->getName());
             if ($parsedParams->has($name)) {
                 $arguments[] = $parsedParams[$name];
+            } elseif ($parameter->isOptional()) {
+                $arguments[] = null;
             } else {
-                if ($parameter->isOptional()) {
-                    $arguments[] = null;
-                } else {
-                    // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
-                    // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
-                    $class = null;
-                    try {
-                        /** @var ReflectionNamedType $type */
-                        $type = $parameter->getType();
-                        $class = $type ? new ReflectionClass($type->getName()) : null;
-                        if ($class
-                            && $class->implementsInterface(RequestInterface::class)
-                        ) {
-                            $arguments[] = $request;
-                            continue;
-                        }
-                    } catch (ReflectionException $ex) {
-                        // Do nothing.
+                // In some cases, user want to pass the request to the handler, we can't expect them to use a certain
+                // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
+                $class = null;
+                try {
+                    /** @var ReflectionNamedType $type */
+                    $type  = $parameter->getType();
+                    $class = $type ? new ReflectionClass($type->getName()) : null;
+                    if ($class
+                        && $class->implementsInterface(RequestInterface::class)
+                    ) {
+                        $arguments[] = $request;
                         continue;
                     }
-                    // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
-                    // not exist.
-                    throw new HttpBadRequestException(
-                        sprintf(
-                            'Parameter in handler does not exist in pattern (%s).',
-                            $parameter->getName()
-                        )
-                    );
+                } catch (ReflectionException) {
+                    // Do nothing.
+                    continue;
                 }
+                // Finally, if it's not a request interface, it should be thrown as a bad request, the argument does
+                // not exist.
+                throw new HttpBadRequestException(
+                    sprintf(
+                        'Parameter in handler does not exist in pattern (%s).',
+                        $parameter->getName()
+                    )
+                );
             }
         }
 

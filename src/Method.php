@@ -7,9 +7,6 @@
 
 namespace Hrafn\Router;
 
-use Jitesoft\Utilities\DataStructures\Lists\IndexedList;
-use Jitesoft\Utilities\DataStructures\Lists\IndexedListInterface;
-
 /**
  * Method
  * @author Johannes Tegnér <johannes@jitesoft.com>

@@ -24,7 +24,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function get(string $pattern,
-                        string|callable $handler,
+                        string | callable $handler,
                         array $middleWares = []): static;
 
     /**
@@ -36,7 +36,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function head(string $pattern,
-                         string|callable $handler,
+                         string | callable $handler,
                          array $middleWares = []): static;
 
     /**
@@ -48,7 +48,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function post(string $pattern,
-                         string|callable $handler,
+                         string | callable $handler,
                          array $middleWares = []): static;
 
     /**
@@ -60,7 +60,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function put(string $pattern,
-                        string|callable $handler,
+                        string | callable $handler,
                         array $middleWares = []): static;
 
     /**
@@ -72,7 +72,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function delete(string $pattern,
-                           string|callable $handler,
+                           string | callable $handler,
                            array $middleWares = []): static;
 
     /**
@@ -84,7 +84,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function connect(string $pattern,
-                            string|callable $handler,
+                            string | callable $handler,
                             array $middleWares = []): static;
 
     /**
@@ -96,7 +96,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function options(string $pattern,
-                            string|callable $handler,
+                            string | callable $handler,
                             array $middleWares = []): static;
 
     /**
@@ -108,7 +108,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function trace(string $pattern,
-                          string|callable $handler,
+                          string | callable $handler,
                           array $middleWares = []): static;
 
     /**
@@ -120,7 +120,7 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function patch(string $pattern,
-                          string|callable $handler,
+                          string | callable $handler,
                           array $middleWares = []): static;
 
     /**

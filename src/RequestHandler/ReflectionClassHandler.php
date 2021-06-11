@@ -1,6 +1,6 @@
 <?php
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  ReflectionClassHandler.phpandler.php - Part of the router project.
+  ReflectionClassHandler.php - Part of the router project.
 
   © - Jitesoft 2018
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -8,12 +8,10 @@ namespace Hrafn\Router\RequestHandler;
 
 use Hrafn\Router\Action;
 use Hrafn\Router\Contracts\ParameterExtractorInterface;
-use Hrafn\Router\Router;
 use Jitesoft\Container\Injector;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
 use Jitesoft\Exceptions\Psr\Container\ContainerException;
-use Jitesoft\Utilities\DataStructures\Queues\QueueInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\RequestInterface;
@@ -78,12 +76,11 @@ class ReflectionClassHandler implements RequestHandlerInterface {
             return $this->process($request);
         }
 
-        $class = null;
-        if ($this->container->has($this->className)) {
-            $class = $this->container->get($this->className);
-        } else {
-            $class = (new Injector($this->container))->create($this->className);
-        }
+        $class = $this->container->has(
+            $this->className
+        ) ? $this->container->get(
+            $this->className
+        ) : (new Injector($this->container))->create($this->className);
 
         if (!method_exists($class, $this->classMethod)) {
             throw new HttpInternalServerErrorException(
@@ -138,12 +135,12 @@ class ReflectionClassHandler implements RequestHandlerInterface {
                 try {
                     /** @var ReflectionNamedType $type */
                     $type = $parameter->getType();
-                    $c = $type ? new ReflectionClass($type->getName()) : null;
+                    $c    = $type ? new ReflectionClass($type->getName()) : null;
                     if ($c && $c->implementsInterface(Request::class)) {
                         $arguments[] = $request;
                         continue;
                     }
-                } catch (ReflectionException $ex) {
+                } catch (ReflectionException) {
                     // Do nothing, this is okay.
                     continue;
                 }
