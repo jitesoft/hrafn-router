@@ -24,8 +24,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function get(string $pattern,
-                        $handler,
-                        array $middleWares = []): self;
+                        string|callable $handler,
+                        array $middleWares = []): static;
 
     /**
      * Create a head action.
@@ -36,8 +36,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function head(string $pattern,
-                         $handler,
-                         array $middleWares = []): self;
+                         string|callable $handler,
+                         array $middleWares = []): static;
 
     /**
      * Create a post action.
@@ -48,8 +48,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function post(string $pattern,
-                         $handler,
-                         array $middleWares = []): self;
+                         string|callable $handler,
+                         array $middleWares = []): static;
 
     /**
      * Create a put action.
@@ -60,8 +60,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function put(string $pattern,
-                        $handler,
-                        array $middleWares = []): self;
+                        string|callable $handler,
+                        array $middleWares = []): static;
 
     /**
      * Create a delete action.
@@ -72,8 +72,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function delete(string $pattern,
-                           $handler,
-                           array $middleWares = []): self;
+                           string|callable $handler,
+                           array $middleWares = []): static;
 
     /**
      * Create a connect action.
@@ -84,8 +84,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function connect(string $pattern,
-                            $handler,
-                            array $middleWares = []): self;
+                            string|callable $handler,
+                            array $middleWares = []): static;
 
     /**
      * Create a options action.
@@ -96,8 +96,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function options(string $pattern,
-                            $handler,
-                            array $middleWares = []): self;
+                            string|callable $handler,
+                            array $middleWares = []): static;
 
     /**
      * Create a trace action.
@@ -108,8 +108,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function trace(string $pattern,
-                          $handler,
-                          array $middleWares = []): self;
+                          string|callable $handler,
+                          array $middleWares = []): static;
 
     /**
      * Create a patch action.
@@ -120,8 +120,8 @@ interface RouteBuilderInterface {
      * @return RouteBuilderInterface
      */
     public function patch(string $pattern,
-                          $handler,
-                          array $middleWares = []): self;
+                          string|callable $handler,
+                          array $middleWares = []): static;
 
     /**
      * Create a new namespace inside of current namespace.
@@ -134,7 +134,7 @@ interface RouteBuilderInterface {
      */
     public function namespace(string $pattern,
                               callable $closure,
-                              array $middleWares = []): self;
+                              array $middleWares = []): static;
 
     /**
      * Create a new group inside of current group.
@@ -148,6 +148,6 @@ interface RouteBuilderInterface {
      */
     public function group(string $pattern,
                           callable $closure,
-                          array $middleWares = []): self;
+                          array $middleWares = []): static;
 
 }

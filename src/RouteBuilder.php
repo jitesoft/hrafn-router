@@ -44,15 +44,15 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
     /**
      * RouteBuilder constructor.
      *
-     * @param array                           $middlewares        List of middlewares.
-     * @param Node                            $node               Root node.
-     * @param PathExtractorInterface          $extractor          Path extractor object.
-     * @param ParameterExtractorInterface     $parameterExtractor Parameter extractor object.
-     * @param RouteTreeManager                $manager            RouteTree manager.
-     * @param string                          $basePattern        Base pattern of current node.
-     * @param LoggerInterface                 $logger             Logger to use.
-     * @param MapInterface                    $actionContainer    Container which actions is stored in.
-     * @param ContainerInterface|MapInterface $container          Dependency container to use for injection.
+     * @param array                                $middlewares        List of middlewares.
+     * @param Node                                 $node               Root node.
+     * @param PathExtractorInterface               $extractor          Path extractor object.
+     * @param ParameterExtractorInterface          $parameterExtractor Parameter extractor object.
+     * @param RouteTreeManager                     $manager            RouteTree manager.
+     * @param string                               $basePattern        Base pattern of current node.
+     * @param LoggerInterface                      $logger             Logger to use.
+     * @param MapInterface                         $actionContainer    Container which actions is stored in.
+     * @param ContainerInterface|MapInterface|null $container          Dependency container to use for injection.
      */
     public function __construct(
         array $middlewares,
@@ -63,7 +63,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
         string $basePattern,
         LoggerInterface $logger,
         MapInterface $actionContainer,
-        $container = null
+        ContainerInterface|MapInterface|null $container = null
     ) {
         $this->root               = $node;
         $this->middlewares        = $middlewares;
@@ -112,15 +112,14 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * @param string          $method      Http method as string.
      * @param string          $pattern     Pattern used for the action.
      * @param string|callable $handler     Handler to handle the action.
-     * @param array           $middleWares Middlewares used for the specific action.
-     * @return RouteBuilderInterface
+     * @param array|null      $middleWares Middlewares used for the specific action.
+     * @return static
      */
-    protected function action(
-        string $method,
-        string $pattern,
-        $handler,
-        array $middleWares = []
-    ): RouteBuilderInterface {
+    protected function action(string $method,
+                              string $pattern,
+                              string|callable $handler,
+                              ?array $middleWares = []
+    ): static {
         $pattern   = $this->cleanupPattern($pattern);
         $reference = sprintf(
             '%s::%s/%s',
@@ -155,16 +154,16 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * Create a new namespace inside of current namespace.
      * A RouteBuilderInterface instance is passed as the single argument to the $closure callback.
      *
-     * @param string   $pattern     Pattern for the namespace/group.
-     * @param callable $closure     Closure which will be passed the route builder.
-     * @param array    $middleWares Create a new route namespace/group.
-     * @return RouteBuilderInterface
+     * @param string     $pattern     Pattern for the namespace/group.
+     * @param callable   $closure     Closure which will be passed the route builder.
+     * @param array|null $middleWares Create a new route namespace/group.
+     * @return static
      */
     public function namespace(
         string $pattern,
         callable $closure,
-        array $middleWares = []
-    ): RouteBuilderInterface {
+        ?array $middleWares = []
+    ): static {
         $pattern = $this->cleanupPattern($pattern);
 
         $pathParts = $this->extractor->getUriParts($pattern);
@@ -198,16 +197,16 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      *
      * @alias namespace
      *
-     * @param string   $pattern     Pattern for the namespace/group.
-     * @param callable $closure     Closure which will be passed the route builder.
-     * @param array    $middleWares Create a new route namespace/group.
-     * @return RouteBuilderInterface
+     * @param string     $pattern     Pattern for the namespace/group.
+     * @param callable   $closure     Closure which will be passed the route builder.
+     * @param array|null $middleWares Create a new route namespace/group.
+     * @return static
      */
     public function group(
         string $pattern,
         callable $closure,
-        array $middleWares = []
-    ): RouteBuilderInterface {
+        array|null $middleWares = []
+    ): static {
         return $this->namespace($pattern, $closure, $middleWares);
     }
 

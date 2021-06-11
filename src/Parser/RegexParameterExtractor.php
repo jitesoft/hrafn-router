@@ -161,7 +161,7 @@ class RegexParameterExtractor implements ParameterExtractorInterface {
             $matches,
             PREG_PATTERN_ORDER | PREG_UNMATCHED_AS_NULL
         );
-        array_change_key_case($matches ?? [], 0);
+        $matches = array_change_key_case($matches ?? [], CASE_LOWER);
         $optionalParameterNames = $this->getParameterNames($pattern, true);
         $requiredParameterNames = $this->getParameterNames($pattern, false);
 

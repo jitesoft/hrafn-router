@@ -6,7 +6,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Traits;
 
-use Hrafn\Router\Contracts\RouteBuilderInterface;
 use Hrafn\Router\Method;
 
 /**
@@ -28,14 +27,14 @@ trait MethodToActionTrait {
      * @param string          $method      Method for the given action.
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
-     * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @param array|null      $middleWares Middlewares to use for the action.
+     * @return static
      */
     abstract protected function action(string $method,
-                                       string $pattern,
-                                       $handler,
-                                       array $middleWares = []
-    ): RouteBuilderInterface;
+        string $pattern,
+        string|callable $handler,
+        ?array $middleWares = []
+    ): static;
 
     /**
      * Create a get action.
@@ -43,11 +42,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function get(string $pattern,
-                        $handler,
-                        array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::GET, $pattern, $handler, $middleWares);
     }
 
@@ -57,11 +56,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function head(string $pattern,
-                         $handler,
-                         array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::HEAD, $pattern, $handler, $middleWares);
     }
 
@@ -71,11 +70,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function post(string $pattern,
-                         $handler,
-                         array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::POST, $pattern, $handler, $middleWares);
     }
 
@@ -85,11 +84,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function put(string $pattern,
-                        $handler,
-                        array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::PUT, $pattern, $handler, $middleWares);
     }
 
@@ -99,11 +98,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function delete(string $pattern,
-                           $handler,
-                           array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::DELETE, $pattern, $handler, $middleWares);
     }
 
@@ -113,11 +112,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function connect(string $pattern,
-                            $handler,
-                            array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::CONNECT, $pattern, $handler, $middleWares);
     }
 
@@ -127,11 +126,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function options(string $pattern,
-                            $handler,
-                            array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::OPTIONS, $pattern, $handler, $middleWares);
     }
 
@@ -141,11 +140,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function trace(string $pattern,
-                          $handler,
-                          array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::TRACE, $pattern, $handler, $middleWares);
     }
 
@@ -155,12 +154,11 @@ trait MethodToActionTrait {
      * @param string          $pattern     Pattern for the specific action.
      * @param string|callable $handler     Handler to handle the action.
      * @param array           $middleWares Middlewares to use for the action.
-     * @return RouteBuilderInterface
+     * @return static
      */
     public function patch(string $pattern,
-                          $handler,
-                          array $middleWares = []): RouteBuilderInterface {
+        string|callable $handler,
+        array $middleWares = []): static {
         return $this->action(Method::PATCH, $pattern, $handler, $middleWares);
     }
-
 }

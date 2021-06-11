@@ -26,7 +26,7 @@ trait HandleMiddlewareTrait {
      * @return mixed
      * @throws HttpInternalServerErrorException If middleware was a string which could not be resolved.
      */
-    public function process(RequestInterface $request) {
+    public function process(RequestInterface $request): mixed {
         if (count(Router::$disabledMiddleware) > 0) {
             $disabled = in_array(
                 get_class(
