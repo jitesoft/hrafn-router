@@ -14,8 +14,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionNamedType;
 
 /**
  * ReflectionCallbackHandler
@@ -90,7 +92,9 @@ class ReflectionCallbackHandler implements RequestHandlerInterface {
                     // name, so instead, we force them to use a RequestInterface implementation as the parameter type.
                     $class = null;
                     try {
-                        $class = $parameter->getClass();
+                        /** @var ReflectionNamedType $type */
+                        $type = $parameter->getType();
+                        $class = $type ? new ReflectionClass($type->getName()) : null;
                         if ($class
                             && $class->implementsInterface(RequestInterface::class)
                         ) {
