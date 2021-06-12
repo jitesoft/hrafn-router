@@ -8,8 +8,6 @@
 namespace Hrafn\Router;
 
 use Hrafn\Router\{Attributes\ActionResolver,
-    Attributes\AttributeResolver,
-    Attributes\Controller,
     Attributes\ControllerResolver,
     Attributes\MiddlewareResolver,
     Contracts\ActionResolverInterface,
@@ -42,6 +40,7 @@ use Psr\Http\{
     Message\ServerRequestInterface,
     Server\RequestHandlerInterface
 };
+use ReflectionException;
 
 /**
  * Router
@@ -101,7 +100,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
      * Router constructor.
      *
      * @param ContainerInterface|null $container     Dependency container.
-     * @param bool                    $useAttributes If the router should resolve attribute based routes or not.
+     * @param boolean                 $useAttributes If the router should resolve attribute based routes or not.
      */
     public function __construct(?ContainerInterface $container = null, bool $useAttributes = false) {
         $this->container = $container ?? new SimpleMap();
@@ -133,7 +132,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         $this->actions          = new SimpleMap();
         $this->rootNode         = new Node(null, '');
 
-        $this->routeBuilder     = new RouteBuilder(
+        $this->routeBuilder = new RouteBuilder(
             [],
             $this->rootNode,
             $this->pathExtractor,
@@ -146,21 +145,35 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         );
 
         if ($useAttributes) {
-            $controllerResolver = $get(ControllerResolverInterface::class, new ControllerResolver());
+            $controllerResolver = $get(
+                ControllerResolverInterface::class,
+                new ControllerResolver()
+            );
             $actionResolver     = $get(
                 ActionResolverInterface::class,
-                new ActionResolver($get(MiddlewareResolverInterface::class, new MiddlewareResolver()), $controllerResolver)
+                new ActionResolver(
+                    $get(
+                        MiddlewareResolverInterface::class,
+                        new MiddlewareResolver()
+                    ),
+                    $controllerResolver
+                )
             );
 
             $this->buildAttributeRoutes($actionResolver, $controllerResolver);
         }
     }
 
-    public function buildAttributeRoutes(
+    /**
+     * @param ActionResolverInterface     $actionResolver     Action resolver.
+     * @param ControllerResolverInterface $controllerResolver Controller resolver.
+     * @throws InvalidArgumentException On attribute resolve error.
+     * @throws ReflectionException On reflection error.
+     * @return void
+     */
+    private function buildAttributeRoutes(
         ActionResolverInterface $actionResolver,
         ControllerResolverInterface $controllerResolver): void {
-
-        // Use cache!
         $actions = $actionResolver->getFunctionActions();
         foreach ($controllerResolver->getAllControllers() as $controller) {
             $actions = array_merge($actions, $actionResolver->getControllerActions($controller));

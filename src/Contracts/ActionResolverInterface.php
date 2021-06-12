@@ -5,6 +5,7 @@ use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use ReflectionException;
 
 interface ActionResolverInterface {
+
     /**
      * Fetch an array with all defined actions from a specific controller.
      * Resulting array will contain assoc arrays like the following:
@@ -20,10 +21,8 @@ interface ActionResolverInterface {
      *
      * @param string|object $controller Controller to fetch actions from.
      * @return array
-     * @throws InvalidArgumentException On Invalid action method.
-     * @throws ReflectionException On reflection error.
      */
-    public function getControllerActions(string|object $controller): array;
+    public function getControllerActions(string | object $controller): array;
 
     /**
      * Fetch an array with all defined function actions.
@@ -38,7 +37,7 @@ interface ActionResolverInterface {
      * </pre>
      *
      * @return array
-     * @throws InvalidArgumentException On Invalid action method.
      */
     public function getFunctionActions(): array;
+
 }

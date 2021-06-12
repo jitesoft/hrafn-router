@@ -1,5 +1,9 @@
 <?php
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  Action.php - Part of the router project.
 
+  © - Jitesoft 2018-2021
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Attributes;
 
 use Attribute;
@@ -36,12 +40,20 @@ class Action {
      */
     public string $method;
 
-    public function __construct(string $path = '', string $method = "GET") {
-        $this->path = trim($path, '/');
+    /**
+     * Action constructor.
+     *
+     * @param string $path   Path/Pattern used by the action.
+     * @param string $method Method used by the action.
+     * @throws InvalidArgumentException If method is not a valid http method.
+     */
+    public function __construct(string $path = '', string $method = 'GET') {
+        $this->path   = trim($path, '/');
         $this->method = $method;
 
         if (!in_array(strtolower($this->method), Method::getConstantValues())) {
             throw new InvalidArgumentException('Invalid route method. See Hrafn\Router\Method for allowed values.');
         }
     }
+
 }

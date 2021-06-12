@@ -1,4 +1,9 @@
 <?php
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  Action.php - Part of the router project.
+
+  © - Jitesoft 2018-2021
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Attributes;
 
 use Hrafn\Router\Action as RouterAction;
@@ -18,9 +23,9 @@ class MiddlewareResolver implements MiddlewareResolverInterface {
      * @throws ReflectionException On reflection error.
      */
     public function getControllerMiddlewares(string | object $controller): array {
-        $refClass = new ReflectionClass($controller);
+        $refClass   = new ReflectionClass($controller);
         $attributes = $refClass->getAttributes(Middleware::class);
-        $result = [];
+        $result     = [];
 
         foreach ($attributes as $attribute) {
             /** @var Middleware $instance */
@@ -46,7 +51,8 @@ class MiddlewareResolver implements MiddlewareResolverInterface {
      * @return array
      * @throws ReflectionException On reflection error.
      */
-    public function getActionMiddlewares(string | callable $method, object | string $controller = null): array {
+    public function getActionMiddlewares(string | callable $method,
+                                         object | string $controller = null): array {
         if (!$controller && is_string($method) && str_contains($method, '@')) {
             [$controller, $method] = explode(RouterAction::$HANDLER_SEPARATOR, $method);
         }
@@ -56,7 +62,7 @@ class MiddlewareResolver implements MiddlewareResolverInterface {
             $refMethod  = new ReflectionMethod($controller, $method);
             $attributes = $refMethod->getAttributes(Middleware::class);
         } else {
-            $refFunc = new ReflectionFunction($method);
+            $refFunc    = new ReflectionFunction($method);
             $attributes = $refFunc->getAttributes(Middleware::class);
         }
 
@@ -69,4 +75,5 @@ class MiddlewareResolver implements MiddlewareResolverInterface {
 
         return $result;
     }
+
 }

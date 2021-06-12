@@ -4,14 +4,14 @@ namespace Hrafn\Router\Contracts;
 use ReflectionException;
 
 interface MiddlewareResolverInterface {
+
     /**
      * Get a list of middlewares attached to a controller class.
      *
      * @param string|object $controller Controller to get middlewares from.
      * @return array
-     * @throws ReflectionException On reflection error.
      */
-    public function getControllerMiddlewares(string|object $controller): array;
+    public function getControllerMiddlewares(string | object $controller): array;
 
     /**
      * Get a list of middlewares attached to an action.
@@ -26,7 +26,7 @@ interface MiddlewareResolverInterface {
      * @param string|callable    $method     Method/Function to get middlewares from.
      * @param object|string|null $controller Optional controller, in case the action is bound to a class.
      * @return array
-     * @throws ReflectionException On reflection error.
      */
-    public function getActionMiddlewares(string|callable $method, object|string $controller = null): array;
+    public function getActionMiddlewares(string | callable $method, object | string $controller = null): array;
+
 }

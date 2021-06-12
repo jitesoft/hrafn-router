@@ -1,4 +1,9 @@
 <?php
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  Action.php - Part of the router project.
+
+  © - Jitesoft 2018-2021
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Attributes;
 
 use Hrafn\Router\Contracts\ActionResolverInterface;
@@ -16,7 +21,12 @@ class ActionResolver implements ActionResolverInterface {
     private ControllerResolverInterface $controllerResolver;
     private MiddlewareResolverInterface $middlewareResolver;
 
-
+    /**
+     * ActionResolver constructor.
+     *
+     * @param MiddlewareResolverInterface $middlewareResolver Middleware resolver.
+     * @param ControllerResolverInterface $controllerResolver Controller resolver.
+     */
     public function __construct(MiddlewareResolverInterface $middlewareResolver,
                                 ControllerResolverInterface $controllerResolver) {
         $this->middlewareResolver = $middlewareResolver;
@@ -53,7 +63,7 @@ class ActionResolver implements ActionResolverInterface {
                 $r = $this->getAction($method->getName(), $controller);
                 if ($r !== null) {
                     $r['middlewares'] = array_merge($baseMiddlewares, $r['middlewares']);
-                    $r['path'] = $basePath . $r['path'];
+                    $r['path']        = $basePath . $r['path'];
 
                     $result[] = $r;
                 }
@@ -91,6 +101,14 @@ class ActionResolver implements ActionResolverInterface {
         return $actions;
     }
 
+    /**
+     * Fetch action data from action.
+     *
+     * @param string|object      $action Action to get data for.
+     * @param string|object|null $class  Class/Controller to get action for.
+     * @return array|null
+     * @throws ReflectionException On reflection error.
+     */
     private function getAction(string | object $action, string | object $class = null): ?array {
         if (!$class && is_string($action) && str_contains($action, RouterAction::$HANDLER_SEPARATOR)) {
             [$class, $action] = explode(RouterAction::$HANDLER_SEPARATOR, $action);

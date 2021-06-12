@@ -1,4 +1,9 @@
 <?php
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  Action.php - Part of the router project.
+
+  © - Jitesoft 2018-2021
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Attributes;
 
 use Attribute;
@@ -30,12 +35,16 @@ class Middleware {
      * Middleware constructor.
      *
      * @param string $fqn Class name to resolve.
+     * @throws InvalidArgumentException If middleware class is not a middleware.
      */
     public function __construct(string $fqn) {
         $this->fqn = $fqn;
-        $class = new ReflectionClass($fqn);
+        $class     = new ReflectionClass($fqn);
         if (!$class->implementsInterface(MiddlewareInterface::class)) {
-            throw new InvalidArgumentException('Middleware class must implement Psr/Http/Server/MiddlewareInterface.');
+            throw new InvalidArgumentException(
+                'Middleware class must implement Psr/Http/Server/MiddlewareInterface.'
+            );
         }
     }
+
 }

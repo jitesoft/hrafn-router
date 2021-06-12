@@ -1,5 +1,9 @@
 <?php
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  Action.php - Part of the router project.
 
+  © - Jitesoft 2018-2021
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 namespace Hrafn\Router\Attributes;
 
 use Hrafn\Router\Contracts\ControllerResolverInterface;
@@ -13,14 +17,14 @@ class ControllerResolver implements ControllerResolverInterface {
      * Fetch all controllers declared in the code.
      *
      * @return array Controller FQN's as an array.
-     * @throws ReflectionException
+     * @throws ReflectionException On reflection error.
      */
     public function getAllControllers(): array {
-        $classes = get_declared_classes();
+        $classes     = get_declared_classes();
         $controllers = [];
 
         foreach ($classes as $class) {
-            $refClass = new ReflectionClass($class);
+            $refClass   = new ReflectionClass($class);
             $attributes = $refClass->getAttributes(Controller::class);
 
             if (empty($attributes)) {
@@ -33,7 +37,6 @@ class ControllerResolver implements ControllerResolverInterface {
         return $controllers;
     }
 
-
     /**
      * Get the path of the Controller.
      * The controller path will be prepended to the actions in the controller.
@@ -43,9 +46,9 @@ class ControllerResolver implements ControllerResolverInterface {
      * @throws ReflectionException On reflection error.
      */
     public function getPath(string | object $class): string {
-        $refClass = new ReflectionClass($class);
+        $refClass   = new ReflectionClass($class);
         $attributes = $refClass->getAttributes(Controller::class);
-        $att = Arrays::first($attributes);
+        $att        = Arrays::first($attributes);
 
         if ($att === null) {
             return '/';
@@ -55,4 +58,5 @@ class ControllerResolver implements ControllerResolverInterface {
         $attribute = $att->newInstance();
         return $attribute->path;
     }
+
 }

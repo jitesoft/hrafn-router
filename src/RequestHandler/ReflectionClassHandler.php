@@ -36,7 +36,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
     private string $classMethod;
     private ParameterExtractorInterface $parameterExtractor;
     private Action $action;
-    private ContainerInterface|MapInterface $container;
+    private ContainerInterface | MapInterface $container;
 
     /**
      * ReflectionClassHandler constructor.
@@ -52,7 +52,7 @@ class ReflectionClassHandler implements RequestHandlerInterface {
         string $classMethod,
         ParameterExtractorInterface $parameterExtractor,
         Action $action,
-        ContainerInterface|MapInterface $container
+        ContainerInterface | MapInterface $container
     ) {
         $this->className          = $className;
         $this->classMethod        = $classMethod;
