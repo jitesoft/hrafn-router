@@ -3,29 +3,44 @@
 namespace Hrafn\Router\Tests\Attributes;
 
 use Hrafn\Router\Attributes\Controller;
-use ReflectionException;
+use Hrafn\Router\Attributes\ControllerResolver;
+use Hrafn\Router\Contracts\ControllerResolverInterface;
 use PHPUnit\Framework\TestCase;
 
 class ControllerTest extends TestCase {
 
-    public function testIsController(): void {
-        self::assertTrue(Controller::classIsController(ControllerWithAttribute::class));
-        self::assertTrue(Controller::classIsController(new ControllerWithAttribute()));
-        self::assertFalse(Controller::classIsController(NotAController::class));
-        self::assertFalse(Controller::classIsController(new NotAController()));
+    private ControllerResolverInterface $controllerResolver;
 
-        $this->expectException(ReflectionException::class);
-        Controller::classIsController('Asadkjldsajkldsalkjdsa');
+    public function setUp(): void {
+        $this->controllerResolver = new ControllerResolver();
     }
 
     public function testRouteIsDefault(): void {
-        self::assertEquals('/', Controller::getRoute(ControllerWithAttribute::class));
-        self::assertEquals('/', Controller::getRoute(new ControllerWithAttribute()));
+        self::assertEquals('/', $this->controllerResolver->getPath(ControllerWithAttribute::class));
+        self::assertEquals('/', $this->controllerResolver->getPath(new ControllerWithAttribute()));
     }
 
     public function testRouteIsNotDefault(): void {
-        self::assertEquals('/is/not/default', Controller::getPath(ControllerWithAttributeTwo::class));
-        self::assertEquals('/is/not/default', Controller::getPath(new ControllerWithAttributeTwo()));
+        self::assertEquals('/is/not/default', $this->controllerResolver->getPath(ControllerWithAttributeTwo::class));
+        self::assertEquals('/is/not/default', $this->controllerResolver->getPath(new ControllerWithAttributeTwo()));
+    }
+
+    public function testGetAllControllers(): void {
+        $result = $this->controllerResolver->getAllControllers();
+
+        self::assertContains(
+            ControllerWithAttribute::class,
+            $result
+        );
+
+        self::assertContains(
+            ControllerWithAttributeTwo::class,
+            $result
+        );
+
+        self::assertNotContains([
+            NotAController::class
+        ], $result);
     }
 
 }

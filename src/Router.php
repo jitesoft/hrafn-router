@@ -7,8 +7,15 @@
 
 namespace Hrafn\Router;
 
-use Hrafn\Router\ {
+use Hrafn\Router\{Attributes\ActionResolver,
+    Attributes\AttributeResolver,
+    Attributes\Controller,
+    Attributes\ControllerResolver,
+    Attributes\MiddlewareResolver,
+    Contracts\ActionResolverInterface,
+    Contracts\ControllerResolverInterface,
     Contracts\DispatcherInterface,
+    Contracts\MiddlewareResolverInterface,
     Contracts\ParameterExtractorInterface,
     Contracts\RouteBuilderInterface,
     Contracts\PathExtractorInterface,
@@ -16,8 +23,7 @@ use Hrafn\Router\ {
     Parser\RegexParameterExtractor as ParamExtractor,
     Parser\RegexPathExtractor as PathExtractor,
     RouteTree\Node,
-    RouteTree\RouteTreeManager
-};
+    RouteTree\RouteTreeManager};
 use Jitesoft\Exceptions\Http\Client\HttpMethodNotAllowedException;
 use Jitesoft\Exceptions\Http\Client\HttpNotFoundException;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
@@ -93,9 +99,10 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
     /**
      * Router constructor.
      *
-     * @param ContainerInterface|null $container Dependency container.
+     * @param ContainerInterface|null $container     Dependency container.
+     * @param bool                    $useAttributes If the router should resolve attribute based routes or not.
      */
-    public function __construct(?ContainerInterface $container = null) {
+    public function __construct(?ContainerInterface $container = null, bool $useAttributes = false) {
         $this->container = $container ?? new SimpleMap();
 
         $get = function ($name, $default) {
@@ -124,6 +131,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         $this->routeTreeManager = new RouteTreeManager($this->logger);
         $this->actions          = new SimpleMap();
         $this->rootNode         = new Node(null, '');
+
         $this->routeBuilder     = new RouteBuilder(
             [],
             $this->rootNode,
@@ -135,6 +143,33 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             $this->actions,
             $this->container
         );
+
+        if ($useAttributes) {
+            $controllerResolver = $get(ControllerResolverInterface::class, new ControllerResolver());
+            $actionResolver     = $get(
+                ActionResolverInterface::class,
+                new ActionResolver($get(MiddlewareResolverInterface::class, new MiddlewareResolver()))
+            );
+
+            $this->buildAttributeRoutes($actionResolver, $controllerResolver);
+        }
+    }
+
+    public function buildAttributeRoutes(
+        ActionResolverInterface $actionResolver,
+        ControllerResolverInterface $controllerResolver): void {
+
+        // Use cache!
+        $actions = $actionResolver->getFunctionActions();
+        foreach ($controllerResolver->getAllControllers() as $controller) {
+            array_merge($actions, $actionResolver->getControllerActions($controller));
+        }
+
+        foreach ($actions as $action) {
+            // Method must be one of the Method:: constants (which is checked in the attribute constructor).
+            $method = strtolower($action['method']);
+            $this->routeBuilder->{$method}(pattern: $action['path'], handler: $action['handler'], middlewares: $action['middlewares']);
+        }
     }
 
     /**

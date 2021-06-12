@@ -1,10 +1,8 @@
 <?php
-
 namespace Hrafn\Router\Attributes;
 
 use Attribute;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
-use Jitesoft\Utilities\DataStructures\Arrays;
 use Psr\Http\Server\MiddlewareInterface;
 use ReflectionClass;
 
@@ -20,7 +18,7 @@ use ReflectionClass;
  * @see Controller
  * @see Action
  */
-#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class Middleware {
 
     /**
@@ -40,18 +38,4 @@ class Middleware {
             throw new InvalidArgumentException('Middleware class must implement Psr/Http/Server/MiddlewareInterface.');
         }
     }
-
-    public static function getMiddlewareName(string | object $class): string {
-        $refClass = new ReflectionClass($class);
-        $attributes = $refClass->getAttributes(static::class);
-        $att = Arrays::first($attributes);
-        return $att->getArguments()['fqn'];
-    }
-
-    public static function hasMiddleware(string | object $class): bool {
-        $refClass = new ReflectionClass($class);
-        $attributes = $refClass->getAttributes(static::class);
-        return count($attributes) > 0;
-    }
-
 }

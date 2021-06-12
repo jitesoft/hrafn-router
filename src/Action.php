@@ -28,7 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @version 1.0.0
  */
 class Action implements ActionInterface {
-    private const HANDLER_SEPARATOR = '@';
+    public static string $HANDLER_SEPARATOR = '@';
 
     private string $method;
     private RequestHandlerInterface $handler;
@@ -58,14 +58,14 @@ class Action implements ActionInterface {
         $this->method  = $method;
         $this->pattern = $pattern;
 
-        if (is_callable($handler)) {
+        if (is_callable($handler) || (is_string($handler) && !str_contains($handler, self::$HANDLER_SEPARATOR))) {
             $this->handler = new ReflectionCallbackHandler(
                 $handler,
                 $parameterExtractor,
                 $this
             );
         } else {
-            $handlerSplit      = explode(self::HANDLER_SEPARATOR, $handler);
+            $handlerSplit      = explode(self::$HANDLER_SEPARATOR, $handler);
                 $this->handler = new ReflectionClassHandler(
                     $handlerSplit[0],
                     $handlerSplit[1],
@@ -73,7 +73,6 @@ class Action implements ActionInterface {
                     $this,
                     $container ?? new Container([])
                 );
-
         }
 
         $middlewares = Arrays::map(

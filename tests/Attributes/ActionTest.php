@@ -3,51 +3,69 @@
 namespace Hrafn\Router\Tests\Attributes;
 
 use Hrafn\Router\Attributes\Action;
+use Hrafn\Router\Attributes\ActionResolver;
 use Hrafn\Router\Attributes\Controller;
+use Hrafn\Router\Attributes\MiddlewareResolver;
+use Hrafn\Router\Contracts\ActionResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 
 class ActionTest extends TestCase {
+    private ActionResolverInterface $actionResolver;
 
-    public function testIsAction(): void {
-        self::assertTrue(Action::isAction(TestController::class . '@getSomething'));
-        self::assertTrue(Action::isAction('getSomething', TestController::class));
-        self::assertTrue(Action::isAction('getSomething', new TestController()));
-    }
 
-    public function testIsActionFunction(): void {
-        self::assertTrue(Action::isAction('Hrafn\Router\Tests\Attributes\testActionFunc'));
-        self::assertTrue(Action::isAction(#[Action]static fn () => null));
-        self::assertTrue(Action::isAction('Hrafn\Router\Tests\Attributes\testActionFuncTwo'));
-        self::assertFalse(Action::isAction('Hrafn\Router\Tests\Attributes\testActionFuncNoAction'));
+    protected function setUp(): void {
+        $this->actionResolver = new ActionResolver(new MiddlewareResolver());
     }
 
     public function testGetActions(): void {
-        $m1 = Action::getActions(TestController::class);
-        $m2 = Action::getActions(new TestController());
+        $m1 = $this->actionResolver->getControllerActions(TestController::class);
+        $m2 = $this->actionResolver->getControllerActions(new TestController());
         self::assertEquals($m1, $m2);
-
         self::assertCount(2, $m1);
-
         self::assertContains([
             'method' => 'GET',
-            'path'   => '/'
+            'path'   => '/',
+            'handler' => TestController::class . '@' . 'getSomething',
+            'middlewares' => []
         ], $m1);
 
         self::assertContains([
             'method' => 'POST',
-            'path'   => '/a/b/c'
+            'path'   => '/a/b/c',
+            'handler' => TestController::class . '@' . 'postSomething',
+            'middlewares' => []
         ], $m2);
+
+        self::assertEmpty($this->actionResolver->getControllerActions(TestControllerNoActions::class));
     }
 
     public function testActionMethodErrorClassName(): void {
         $this->expectException(InvalidArgumentException::class);
-        Action::getActions(TestControllerWithInvalidAction::class);
+        $this->actionResolver->getControllerActions(TestControllerWithInvalidAction::class);
     }
 
     public function testActionMethodErrorObject(): void {
         $this->expectException(InvalidArgumentException::class);
-        Action::getActions(new TestControllerWithInvalidAction());
+        $this->actionResolver->getControllerActions(new TestControllerWithInvalidAction());
+    }
+
+    public function testGetFunctionActions(): void {
+        $actions = $this->actionResolver->getFunctionActions();
+
+        self::assertContains([
+            'method' => 'POST',
+            'path'   => '/a/path',
+            'handler' => __NAMESPACE__ . '\\testActionFunc',
+            'middlewares' => []
+        ], $actions);
+
+        self::assertContains([
+            'method' => 'GET',
+            'path'   => '/',
+            'handler' => __NAMESPACE__ . '\\testActionFuncTwo',
+            'middlewares' => []
+        ], $actions);
     }
 }
 
@@ -58,6 +76,8 @@ function testActionFunc(): void {}
 function testActionFuncTwo(): void {}
 
 function testActionFuncNoAction() {}
+
+class TestControllerNoActions {}
 
 #[Controller]
 class TestController {
@@ -72,7 +92,7 @@ class TestController {
 class TestControllerWithInvalidAction {
     #[Action]
     public function getSomething(): void {}
-    #[Action(method: 'POST', path: '/a/b/c')]
+    #[Action(path: '/a/b/c', method: 'POST')]
     public function postSomething(): void {}
     #[Action(method: 'GAHWAGAAA')]
     public function errorSomething(): void {}
