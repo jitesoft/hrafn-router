@@ -112,7 +112,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
      * @param array|null      $middleWares Middlewares used for the specific action.
      * @return static
      */
-    protected function action(string $method,
+    public function action(string $method,
                               string $pattern,
                               string | callable $handler,
                               ?array $middleWares = []
@@ -139,6 +139,7 @@ class RouteBuilder implements RouteBuilderInterface, LoggerAwareInterface {
                 $this->container
             )
         );
+
         $this->logger->debug(
             '{tag} Action added to node, reference generated successfully.',
             ['tag' => self::LOG_TAG]

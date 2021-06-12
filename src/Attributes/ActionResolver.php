@@ -2,6 +2,7 @@
 namespace Hrafn\Router\Attributes;
 
 use Hrafn\Router\Contracts\ActionResolverInterface;
+use Hrafn\Router\Contracts\ControllerResolverInterface;
 use Hrafn\Router\Contracts\MiddlewareResolverInterface;
 use Jitesoft\Exceptions\Logic\InvalidArgumentException;
 use Jitesoft\Utilities\DataStructures\Arrays;
@@ -12,11 +13,14 @@ use ReflectionMethod;
 use \Hrafn\Router\Action as RouterAction;
 
 class ActionResolver implements ActionResolverInterface {
+    private ControllerResolverInterface $controllerResolver;
     private MiddlewareResolverInterface $middlewareResolver;
 
 
-    public function __construct(MiddlewareResolverInterface $middlewareResolver) {
+    public function __construct(MiddlewareResolverInterface $middlewareResolver,
+                                ControllerResolverInterface $controllerResolver) {
         $this->middlewareResolver = $middlewareResolver;
+        $this->controllerResolver = $controllerResolver;
     }
 
     /**
@@ -38,14 +42,19 @@ class ActionResolver implements ActionResolverInterface {
      * @return array
      */
     public function getControllerActions(string | object $controller): array {
-        $refClass = new ReflectionClass($controller);
-        $methods  = $refClass->getMethods(ReflectionMethod::IS_PUBLIC);
-        $result   = [];
+        $refClass        = new ReflectionClass($controller);
+        $methods         = $refClass->getMethods(ReflectionMethod::IS_PUBLIC);
+        $result          = [];
+        $baseMiddlewares = $this->middlewareResolver->getControllerMiddlewares($controller);
+        $basePath        = $this->controllerResolver->getPath($controller);
 
         foreach ($methods as $method) {
             if (count($method->getAttributes(Action::class)) > 0) {
                 $r = $this->getAction($method->getName(), $controller);
                 if ($r !== null) {
+                    $r['middlewares'] = array_merge($baseMiddlewares, $r['middlewares']);
+                    $r['path'] = $basePath . $r['path'];
+
                     $result[] = $r;
                 }
             }

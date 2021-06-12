@@ -36,8 +36,8 @@ class Action {
      */
     public string $method;
 
-    public function __construct(string $path = '/', string $method = "GET") {
-        $this->path = $path;
+    public function __construct(string $path = '', string $method = "GET") {
+        $this->path = trim($path, '/');
         $this->method = $method;
 
         if (!in_array(strtolower($this->method), Method::getConstantValues())) {

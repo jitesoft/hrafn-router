@@ -148,7 +148,7 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
             $controllerResolver = $get(ControllerResolverInterface::class, new ControllerResolver());
             $actionResolver     = $get(
                 ActionResolverInterface::class,
-                new ActionResolver($get(MiddlewareResolverInterface::class, new MiddlewareResolver()))
+                new ActionResolver($get(MiddlewareResolverInterface::class, new MiddlewareResolver()), $controllerResolver)
             );
 
             $this->buildAttributeRoutes($actionResolver, $controllerResolver);
@@ -162,13 +162,13 @@ class Router implements LoggerAwareInterface, RequestHandlerInterface {
         // Use cache!
         $actions = $actionResolver->getFunctionActions();
         foreach ($controllerResolver->getAllControllers() as $controller) {
-            array_merge($actions, $actionResolver->getControllerActions($controller));
+            $actions = array_merge($actions, $actionResolver->getControllerActions($controller));
         }
 
         foreach ($actions as $action) {
             // Method must be one of the Method:: constants (which is checked in the attribute constructor).
             $method = strtolower($action['method']);
-            $this->routeBuilder->{$method}(pattern: $action['path'], handler: $action['handler'], middlewares: $action['middlewares']);
+            $this->routeBuilder->action($method, $action['path'], $action['handler'], $action['middlewares']);
         }
     }
 

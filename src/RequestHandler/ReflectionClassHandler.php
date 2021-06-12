@@ -12,6 +12,7 @@ use Jitesoft\Container\Injector;
 use Jitesoft\Exceptions\Http\Client\HttpBadRequestException;
 use Jitesoft\Exceptions\Http\Server\HttpInternalServerErrorException;
 use Jitesoft\Exceptions\Psr\Container\ContainerException;
+use Jitesoft\Utilities\DataStructures\Maps\MapInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\RequestInterface;
@@ -35,23 +36,23 @@ class ReflectionClassHandler implements RequestHandlerInterface {
     private string $classMethod;
     private ParameterExtractorInterface $parameterExtractor;
     private Action $action;
-    private ContainerInterface $container;
+    private ContainerInterface|MapInterface $container;
 
     /**
      * ReflectionClassHandler constructor.
      *
-     * @param string                      $className          Name of the class.
-     * @param string                      $classMethod        Name of the method.
-     * @param ParameterExtractorInterface $parameterExtractor Parameter extractor object.
-     * @param Action                      $action             Action object.
-     * @param ContainerInterface          $container          Container.
+     * @param string                          $className          Name of the class.
+     * @param string                          $classMethod        Name of the method.
+     * @param ParameterExtractorInterface     $parameterExtractor Parameter extractor object.
+     * @param Action                          $action             Action object.
+     * @param ContainerInterface|MapInterface $container          Container.
      */
     public function __construct(
         string $className,
         string $classMethod,
         ParameterExtractorInterface $parameterExtractor,
         Action $action,
-        ContainerInterface $container
+        ContainerInterface|MapInterface $container
     ) {
         $this->className          = $className;
         $this->classMethod        = $classMethod;

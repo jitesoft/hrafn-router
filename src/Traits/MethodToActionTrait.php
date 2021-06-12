@@ -30,7 +30,7 @@ trait MethodToActionTrait {
      * @param array|null      $middleWares Middlewares to use for the action.
      * @return static
      */
-    abstract protected function action(string $method,
+    abstract public function action(string $method,
         string $pattern,
         string | callable $handler,
         ?array $middleWares = []

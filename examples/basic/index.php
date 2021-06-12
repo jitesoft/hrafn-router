@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 $router = new \Hrafn\Router\Router();
 $router->getBuilder()->group('api', static function(\Hrafn\Router\RouteBuilder $builder) {

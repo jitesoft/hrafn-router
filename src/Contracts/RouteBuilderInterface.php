@@ -16,6 +16,21 @@ namespace Hrafn\Router\Contracts;
 interface RouteBuilderInterface {
 
     /**
+     * Method which all the http-method specific methods forward data to.
+     *
+     * @param string          $method      Method for the given action.
+     * @param string          $pattern     Pattern for the specific action.
+     * @param string|callable $handler     Handler to handle the action.
+     * @param array|null      $middleWares Middlewares to use for the action.
+     * @return static
+     */
+    public function action(string $method,
+        string $pattern,
+        string | callable $handler,
+        ?array $middleWares = []
+    ): static;
+
+    /**
      * Create a get action.
      *
      * @param string          $pattern     Pattern for the specific action.

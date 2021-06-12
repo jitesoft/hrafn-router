@@ -16,6 +16,7 @@ interface ActionResolverInterface {
      *   'middlewares' => ['array', 'of', 'middleware fqn']
      * ]
      * </pre>
+     * The middlewares will in turn contain the middlewares from the controller class as well.
      *
      * @param string|object $controller Controller to fetch actions from.
      * @return array
