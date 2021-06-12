@@ -21,8 +21,8 @@ class ControllerTest extends TestCase {
     }
 
     public function testRouteIsNotDefault(): void {
-        self::assertEquals('/is/not/default', $this->controllerResolver->getPath(ControllerWithAttributeTwo::class));
-        self::assertEquals('/is/not/default', $this->controllerResolver->getPath(new ControllerWithAttributeTwo()));
+        self::assertEquals('/is/not/default/', $this->controllerResolver->getPath(ControllerWithAttributeTwo::class));
+        self::assertEquals('/is/not/default/', $this->controllerResolver->getPath(new ControllerWithAttributeTwo()));
     }
 
     public function testGetAllControllers(): void {

@@ -29,6 +29,8 @@ class Controller {
      * @param string $path Optional path to prepend to all actions.
      */
     public function __construct(string $path = '/') {
-        $this->path = (str_starts_with($path, '/') ? '' : '/') . $path . (str_ends_with($path,  '/') ? '' : '/');
+        $path = (str_starts_with($path, '/') ? '' : '/') . $path;
+        $path .= (str_ends_with($path,  '/') ? '' : '/');
+        $this->path = $path;
     }
 }

@@ -5,6 +5,7 @@ namespace Hrafn\Router\Tests\Attributes;
 use Hrafn\Router\Attributes\Action;
 use Hrafn\Router\Attributes\ActionResolver;
 use Hrafn\Router\Attributes\Controller;
+use Hrafn\Router\Attributes\ControllerResolver;
 use Hrafn\Router\Attributes\MiddlewareResolver;
 use Hrafn\Router\Contracts\ActionResolverInterface;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +16,7 @@ class ActionTest extends TestCase {
 
 
     protected function setUp(): void {
-        $this->actionResolver = new ActionResolver(new MiddlewareResolver());
+        $this->actionResolver = new ActionResolver(new MiddlewareResolver(), new ControllerResolver());
     }
 
     public function testGetActions(): void {
@@ -23,6 +24,7 @@ class ActionTest extends TestCase {
         $m2 = $this->actionResolver->getControllerActions(new TestController());
         self::assertEquals($m1, $m2);
         self::assertCount(2, $m1);
+
         self::assertContains([
             'method' => 'GET',
             'path'   => '/',

@@ -49,7 +49,7 @@ class ActionResolver implements ActionResolverInterface {
         $basePath        = $this->controllerResolver->getPath($controller);
 
         foreach ($methods as $method) {
-            if (count($method->getAttributes(Action::class)) > 0) {
+            if (!empty($method->getAttributes(Action::class))) {
                 $r = $this->getAction($method->getName(), $controller);
                 if ($r !== null) {
                     $r['middlewares'] = array_merge($baseMiddlewares, $r['middlewares']);
@@ -109,7 +109,7 @@ class ActionResolver implements ActionResolverInterface {
             /** @var Action $actAttribute */
             return [
                 'method'      => $actAttribute->method ?? 'GET',
-                'path'        => $actAttribute->path ?? '/',
+                'path'        => '/' . $actAttribute->path ?? '', // Prepend a '/' due to it being removed in constructor.
                 'handler'     => $function->getName(),
                 'middlewares' => $this->middlewareResolver->getActionMiddlewares($function->getName())
             ];

@@ -53,7 +53,6 @@ class ControllerResolver implements ControllerResolverInterface {
 
         /** @var Controller $attribute */
         $attribute = $att->newInstance();
-        // We want the path as `/a/b/c/`, so to make sure it is, we aught to "fix it up".
         return $attribute->path;
     }
 }

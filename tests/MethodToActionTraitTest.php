@@ -161,7 +161,7 @@ class MethodToActionTraitTestImplementation implements RouteBuilderInterface {
         $this->expectation[$name] = $value;
     }
 
-    protected function action(string $method,
+    public function action(string $method,
                               string $pattern,
                               string|callable $handler,
                               ?array $middleWares = []): static {
