@@ -1,3 +1,7 @@
+variables:
+  PHP_COMMON_SNIFF_FILE: ruleset.xml
+  NO_PHP_7: 'true'
+
 include:
   - file: /Auto/php.yml
     project: jitesoft/gitlab-ci-lib
